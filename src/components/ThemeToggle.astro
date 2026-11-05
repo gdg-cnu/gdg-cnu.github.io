@@ -1,0 +1,47 @@
+---
+/**
+ * 다크 모드 토글
+ * 초기 테마는 BaseHead의 인라인 스크립트가 페인트 전에 적용합니다(깜빡임 방지).
+ */
+---
+
+<button type="button" class="theme-toggle icon-button" aria-label="다크 모드 전환" title="다크 모드 전환">
+  <svg class="icon-sun" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true">
+    <circle cx="12" cy="12" r="4"></circle>
+    <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"></path>
+  </svg>
+  <svg class="icon-moon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+    <path d="M20.5 14.5A8.5 8.5 0 0 1 9.5 3.5a8.5 8.5 0 1 0 11 11z"></path>
+  </svg>
+</button>
+
+<style>
+  .icon-moon {
+    display: none;
+  }
+  :global([data-theme='dark']) .icon-sun {
+    display: none;
+  }
+  :global([data-theme='dark']) .icon-moon {
+    display: block;
+  }
+</style>
+
+<script>
+  const toggle = document.querySelector<HTMLButtonElement>('.theme-toggle');
+  toggle?.addEventListener('click', () => {
+    const next = document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark';
+    document.documentElement.dataset.theme = next;
+    localStorage.setItem('theme', next);
+    // giscus 등 테마를 따라가야 하는 컴포넌트에 알립니다.
+    window.dispatchEvent(new CustomEvent('themechange', { detail: next }));
+  });
+
+  // 사용자가 직접 고른 적이 없으면 OS 설정 변경을 따라갑니다.
+  window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (event) => {
+    if (localStorage.getItem('theme')) return;
+    const next = event.matches ? 'dark' : 'light';
+    document.documentElement.dataset.theme = next;
+    window.dispatchEvent(new CustomEvent('themechange', { detail: next }));
+  });
+</script>

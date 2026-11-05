@@ -1,0 +1,106 @@
+---
+import { Image } from 'astro:assets';
+import { NAV, SITE, SOCIAL } from '@/site.config';
+import icon from '@/assets/brand/gdg-icon.png';
+
+const year = new Date().getFullYear();
+const externalLinks = [
+  { label: 'GitHub', href: SOCIAL.github },
+  { label: 'GDG 커뮤니티', href: SOCIAL.community },
+  { label: 'Instagram', href: SOCIAL.instagram },
+].filter((link) => link.href);
+---
+
+<footer class="site-footer">
+  <div class="container site-footer__inner">
+    <div class="site-footer__brand">
+      <a href="/" class="site-footer__logo">
+        <Image src={icon} alt="" width={24} height={24} />
+        <span>{SITE.brand}</span>
+      </a>
+      <p>{SITE.description}</p>
+    </div>
+
+    <nav class="site-footer__links" aria-label="바닥글 메뉴">
+      <ul>
+        {NAV.map((item) => <li><a href={item.href}>{item.label}</a></li>)}
+        <li><a href="/search/">검색</a></li>
+        <li><a href="/rss.xml">RSS</a></li>
+      </ul>
+      <ul>
+        {
+          externalLinks.map((link) => (
+            <li>
+              <a href={link.href} target="_blank" rel="noopener noreferrer">
+                {link.label} ↗
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </nav>
+  </div>
+  <div class="container site-footer__bottom">
+    <p>© {year} {SITE.brand}. 글의 저작권은 각 작성자에게 있습니다.</p>
+  </div>
+</footer>
+
+<style>
+  .site-footer {
+    margin-top: 6rem;
+    border-top: 1px solid var(--color-border);
+    font-size: 0.875rem;
+    color: var(--color-text-muted);
+  }
+  .site-footer__inner {
+    display: flex;
+    justify-content: space-between;
+    gap: 2rem;
+    padding-top: 2.5rem;
+    padding-bottom: 1.5rem;
+  }
+  .site-footer__brand {
+    max-width: 26rem;
+  }
+  .site-footer__logo {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-weight: 700;
+    color: var(--color-text);
+  }
+  .site-footer__brand p {
+    margin: 0.75rem 0 0;
+    line-height: 1.6;
+  }
+  .site-footer__links {
+    display: flex;
+    gap: 3rem;
+  }
+  .site-footer__links ul {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    display: grid;
+    gap: 0.4rem;
+    align-content: start;
+  }
+  .site-footer__links a:hover {
+    color: var(--color-text);
+  }
+  .site-footer__bottom {
+    padding-top: 1rem;
+    padding-bottom: 2.5rem;
+    color: var(--color-text-subtle);
+    font-size: 0.8125rem;
+  }
+  .site-footer__bottom p {
+    margin: 0;
+  }
+
+  @media (max-width: 640px) {
+    .site-footer__inner {
+      flex-direction: column;
+    }
+  }
+</style>
