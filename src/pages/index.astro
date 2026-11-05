@@ -18,10 +18,10 @@ const typeCounts = countByType(posts);
 const authors = await getCollection('authors');
 
 /*
- * 홈 배너 연출 타이밍 (초)
+ * 홈 배너 연출 타이밍 (초) — 에디터 구문 강조처럼
  * 1) 입력: < 제목 > 이 회색으로 왼쪽부터 타이핑되고 커서가 따라감 (글자 간격은 사람이 치듯 불규칙)
- * 2) 스캔: 입력이 끝나면 커서가 사라지고 GDG 4색 빛줄기가 왼쪽에서 오른쪽으로 훑고 지나감
- * 3) 완료: 빛이 지나간 순서대로 꺾쇠에 색이 채워지고 제목이 본래 색으로 진해짐
+ * 2) 해석: 입력이 끝나면 커서가 사라지고, 에디터가 코드를 읽어들이는 찰나(약 0.18초) 동안 멈춤
+ * 3) 강조: 꺾쇠와 제목에 색이 '팟' 하고 켜짐 (왼쪽 꺾쇠 → 제목 → 오른쪽 꺾쇠, 아주 짧은 간격)
  * 간격은 고정 시드 난수로 정해서 빌드할 때마다 같은 리듬이 나옵니다.
  */
 let seed = 11;
@@ -30,7 +30,7 @@ const rand = () => {
   return seed / 233280;
 };
 const TYPE_START = 0.2;
-const heroChars: { char: string; at: number; hold: number; ink?: number }[] = [];
+const heroChars: { char: string; at: number; hold: number }[] = [];
 let cursor = TYPE_START + 0.12; // 왼쪽 꺾쇠 다음 첫 글자
 for (const char of SITE.heroTitle) {
   heroChars.push({ char: char === ' ' ? ' ' : char, at: cursor, hold: 0 });
@@ -40,43 +40,17 @@ const TYPED_AT = cursor; // 오른쪽 꺾쇠가 입력되는 시각
 heroChars.forEach((item, index) => {
   item.hold = (heroChars[index + 1]?.at ?? TYPED_AT) - item.at;
 });
-const SWEEP_AT = TYPED_AT + 0.08;
-const SWEEP_DURATION = 0.5;
+const HIGHLIGHT_AT = TYPED_AT + 0.18;
 const fmt = (n: number) => `${n.toFixed(3)}s`;
-
-// 빛줄기 이동 곡선 cubic-bezier(0.45, 0, 0.25, 1)에서 "위치 f에 닿는 시각(0~1)"을 구합니다.
-const SWEEP_EASE = [0.45, 0, 0.25, 1] as const;
-const bezier = (t: number, a: number, b: number) => 3 * a * t * (1 - t) ** 2 + 3 * b * t ** 2 * (1 - t) + t ** 3;
-const sweepTimeAt = (position: number) => {
-  let lo = 0;
-  let hi = 1;
-  for (let i = 0; i < 30; i += 1) {
-    const mid = (lo + hi) / 2;
-    if (bezier(mid, SWEEP_EASE[1], SWEEP_EASE[3]) < position) lo = mid;
-    else hi = mid;
-  }
-  return bezier((lo + hi) / 2, SWEEP_EASE[0], SWEEP_EASE[2]);
-};
-// 배너 안 가로 위치(비율)를 em 단위 어림값으로 계산: [꺾쇠 0.78][간격 0.32][제목][간격][꺾쇠]
-const BRACKET_EM = 0.78;
-const GAP_EM = 0.32;
-const TITLE_EM = SITE.heroTitle.length * 0.6;
-const MARK_EM = 2 * (BRACKET_EM + GAP_EM) + TITLE_EM;
-const inkAt = (positionEm: number) => SWEEP_AT + SWEEP_DURATION * sweepTimeAt(positionEm / MARK_EM);
-heroChars.forEach((item, index) => {
-  const center = BRACKET_EM + GAP_EM + ((index + 0.5) / heroChars.length) * TITLE_EM;
-  Object.assign(item, { ink: inkAt(center) });
-});
 const heroTiming = [
   `--type-start:${fmt(TYPE_START)}`,
   `--left-hold:${fmt(heroChars[0].at - TYPE_START)}`,
   `--typed-at:${fmt(TYPED_AT)}`,
-  `--sweep-at:${fmt(SWEEP_AT)}`,
-  `--sweep-duration:${fmt(SWEEP_DURATION)}`,
-  `--left-fill:${fmt(inkAt(BRACKET_EM / 2))}`,
-  `--right-fill:${fmt(inkAt(MARK_EM - BRACKET_EM / 2))}`,
-  `--fade-at:${fmt(SWEEP_AT + SWEEP_DURATION)}`,
-  `--fade-at-2:${fmt(SWEEP_AT + SWEEP_DURATION + 0.1)}`,
+  `--left-fill:${fmt(HIGHLIGHT_AT)}`,
+  `--title-fill:${fmt(HIGHLIGHT_AT + 0.04)}`,
+  `--right-fill:${fmt(HIGHLIGHT_AT + 0.08)}`,
+  `--fade-at:${fmt(HIGHLIGHT_AT + 0.2)}`,
+  `--fade-at-2:${fmt(HIGHLIGHT_AT + 0.3)}`,
 ].join(';');
 ---
 
@@ -84,7 +58,7 @@ const heroTiming = [
   <section class="hero container" style={heroTiming}>
     {
       /*
-        첫 진입 연출 (입력 → 스캔 → 구문 강조). 타이밍은 위 frontmatter 참고.
+        첫 진입 연출 (입력 → 해석 → 구문 강조). 타이밍은 위 frontmatter 참고.
         이 탭에서 이미 봤다면(새로고침 제외) 연출 없이 완성된 모습으로 보여 줍니다.
         저장소를 쓸 수 없는 환경에서는 오류 없이 그냥 재생합니다.
       */
@@ -111,7 +85,7 @@ const heroTiming = [
         <span aria-hidden="true">
           {
             heroChars.map((item) => (
-              <span class="hero__char" style={`--at:${fmt(item.at)};--hold:${fmt(item.hold)};--ink:${fmt(item.ink ?? SWEEP_AT)}`}>
+              <span class="hero__char" style={`--at:${fmt(item.at)};--hold:${fmt(item.hold)}`}>
                 {item.char}
               </span>
             ))
@@ -121,7 +95,6 @@ const heroTiming = [
       <span class="hero__token hero__token--right">
         <Bracket side="right" class="hero__bracket hero__bracket--right" />
       </span>
-      <span class="hero__sweep" aria-hidden="true"></span>
     </div>
     <p class="hero__tagline">{SITE.heroTagline}</p>
     <p class="hero__topics">{SITE.topics.join(' · ')}</p>
@@ -197,6 +170,8 @@ const heroTiming = [
     font-weight: 800;
     letter-spacing: -0.03em;
     white-space: nowrap;
+    /* 3) 강조: 회색으로 입력된 제목이 한 번에 본래 색으로 켜짐 */
+    animation: hero-title-ink 0.12s ease-out var(--title-fill) both;
   }
   .hero :global(.hero__bracket) {
     width: 0.78em;
@@ -209,12 +184,6 @@ const heroTiming = [
     position: relative;
     /* 1ms 선형 전환 = 사실상 즉시 등장. (steps(1)은 지연이 길면 부동소수 오차로 끝까지 투명하게 남는 문제가 있음) */
     animation: hero-type 1ms linear var(--at) both;
-  }
-  /* 글자는 회색으로 입력됐다가 빛줄기가 지나가는 순간 본래 색으로 */
-  .hero__char {
-    animation:
-      hero-type 1ms linear var(--at) both,
-      hero-title-ink 0.25s ease-out var(--ink) both;
   }
   .hero__token--left {
     --at: var(--type-start);
@@ -240,33 +209,12 @@ const heroTiming = [
     right: -0.2em;
   }
 
-  /* 3) 완료: 꺾쇠는 회색으로 입력됐다가 빛이 지나간 순서대로 색이 채워짐 */
+  /* 3) 강조: 꺾쇠는 회색으로 입력됐다가 왼쪽 → 오른쪽 순서로 색이 '팟' 켜짐 */
   .hero__token--left :global(.hero__bracket) {
-    animation: hero-bracket-ink 0.35s ease-out var(--left-fill) both;
+    animation: hero-bracket-ink 0.12s ease-out var(--left-fill) both;
   }
   .hero__token--right :global(.hero__bracket) {
-    animation: hero-bracket-ink 0.35s ease-out var(--right-fill) both;
-  }
-
-  /* 2) 스캔: GDG 4색 빛줄기가 왼쪽 꺾쇠에서 오른쪽 꺾쇠까지 훑고 지나감 */
-  .hero__sweep {
-    position: absolute;
-    top: -0.12em;
-    bottom: -0.12em;
-    left: 0;
-    width: 0.07em;
-    border-radius: 999px;
-    background: linear-gradient(
-      to bottom,
-      var(--gdg-blue) 0 25%,
-      var(--gdg-red) 25% 50%,
-      var(--gdg-yellow) 50% 75%,
-      var(--gdg-green) 75% 100%
-    );
-    box-shadow: 0 0 0.6em rgb(66 133 244 / 0.35);
-    opacity: 0;
-    pointer-events: none;
-    animation: hero-sweep var(--sweep-duration) cubic-bezier(0.45, 0, 0.25, 1) var(--sweep-at) both;
+    animation: hero-bracket-ink 0.12s ease-out var(--right-fill) both;
   }
 
   .hero__tagline {
@@ -284,7 +232,7 @@ const heroTiming = [
   }
 
   /* 이 탭에서 이미 봤으면(새로고침 제외) 처음부터 완성된 모습 */
-  .hero--static :is(h1, .hero__token, .hero__char, .hero__sweep, .hero__tagline, .hero__topics),
+  .hero--static :is(h1, .hero__token, .hero__char, .hero__tagline, .hero__topics),
   .hero--static :global(.hero__bracket),
   .hero--static .hero__char::after,
   .hero--static .hero__token::after {
@@ -313,20 +261,6 @@ const heroTiming = [
   @keyframes hero-bracket-ink {
     from {
       filter: grayscale(1) opacity(0.7);
-    }
-  }
-  @keyframes hero-sweep {
-    0% {
-      left: 0;
-      opacity: 0;
-    }
-    12%,
-    85% {
-      opacity: 1;
-    }
-    100% {
-      left: 100%;
-      opacity: 0;
     }
   }
   @keyframes hero-appear {
