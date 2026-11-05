@@ -3,7 +3,7 @@ import { Image } from 'astro:assets';
 import AuthorByline from './AuthorByline.astro';
 import TagList from './TagList.astro';
 import PostTypeLabel from './PostTypeLabel.astro';
-import { getPostAuthors, readingMinutes, type Post } from '@/utils/posts';
+import { getPostAuthors, type Post } from '@/utils/posts';
 import { formatDate, isoDate } from '@/utils/date';
 
 interface Props {
@@ -15,7 +15,6 @@ interface Props {
 const { post, headingLevel = 'h2' } = Astro.props;
 const { title, description, date, type, tags, thumbnail, thumbnailAlt, draft } = post.data;
 const authors = await getPostAuthors(post);
-const minutes = readingMinutes(post.body);
 const href = `/posts/${post.id}/`;
 const Heading = headingLevel;
 ---
@@ -38,8 +37,6 @@ const Heading = headingLevel;
       <AuthorByline authors={authors} size={20} />
       <span aria-hidden="true">·</span>
       <time datetime={isoDate(date)}>{formatDate(date)}</time>
-      <span aria-hidden="true">·</span>
-      <span title="예상 읽기 시간">{minutes}분 읽기</span>
     </div>
   </div>
   {

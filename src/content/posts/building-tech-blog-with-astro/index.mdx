@@ -76,16 +76,6 @@ tagSlug('GitHub Actions'); // → 'github-actions'
 tagSlug('웹'); // → '웹'
 ```
 
-## 예상 읽기 시간
-
-영어권 도구는 대부분 단어 수로 읽기 시간을 계산합니다. 한국어는 띄어쓰기 단위가 영어 단어보다 길어서, 이 블로그에서는 **한글은 글자 수**, 영문은 단어 수로 따로 셉니다.
-
-```ts {2-3}
-const minutes =
-  hangulCount / 500 + // 한글: 분당 약 500자
-  wordCount / 200; // 영문: 분당 약 200단어
-```
-
 ## GitHub Pages로 배포하기
 
 `main` 브랜치에 커밋이 들어오면 워크플로가 사이트를 빌드하고 GitHub Pages에 올립니다.

@@ -18,12 +18,11 @@ interface Props {
   post: Post;
   authors: Author[];
   headings: MarkdownHeading[];
-  minutes: number;
   prev?: Post;
   next?: Post;
 }
 
-const { post, authors, headings, minutes, prev, next } = Astro.props;
+const { post, authors, headings, prev, next } = Astro.props;
 const { title, description, date, updated, type, tags, thumbnail, thumbnailAlt, draft } = post.data;
 
 const article = {
@@ -65,8 +64,6 @@ const article = {
             </>
           )
         }
-        <span class="dot" aria-hidden="true">·</span>
-        <span title="예상 읽기 시간">{minutes}분 읽기</span>
         <ViewCount />
       </div>
     </header>

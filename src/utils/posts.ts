@@ -47,23 +47,6 @@ export function collectTags(posts: Post[]): TagInfo[] {
   return [...map.values()].sort((a, b) => b.count - a.count || a.name.localeCompare(b.name, 'ko'));
 }
 
-/**
- * 예상 읽기 시간(분)
- * 한글은 분당 약 500자, 영문·숫자 단어는 분당 약 200단어로 계산합니다.
- */
-export function readingMinutes(body = ''): number {
-  const text = body
-    .replace(/^(import|export)\s.*$/gm, '') // MDX import/export
-    .replace(/<[^>]+>/g, ' ') // HTML/JSX 태그
-    .replace(/!\[[^\]]*\]\([^)]*\)/g, ' ') // 이미지
-    .replace(/\[([^\]]*)\]\([^)]*\)/g, '$1') // 링크는 텍스트만
-    .replace(/https?:\/\/\S+/g, ' ');
-
-  const hangul = text.match(/[ㄱ-ㆎ가-힣]/g)?.length ?? 0;
-  const words = text.match(/[A-Za-z0-9]+(?:['’.-][A-Za-z0-9]+)*/g)?.length ?? 0;
-  return Math.max(1, Math.round(hangul / 500 + words / 200));
-}
-
 /** 글 종류별 개수 (POST_TYPES 순서대로, 0개인 종류도 포함) */
 export function countByType(posts: Post[]): Record<PostType, number> {
   const counts = Object.fromEntries(POST_TYPE_KEYS.map((key) => [key, 0])) as Record<PostType, number>;

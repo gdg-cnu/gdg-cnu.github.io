@@ -3,7 +3,7 @@ import type { GetStaticPaths } from 'astro';
 import { render } from 'astro:content';
 import PostLayout from '@/layouts/PostLayout.astro';
 import Callout from '@/components/mdx/Callout.astro';
-import { getPostAuthors, getPublishedPosts, readingMinutes, type Post } from '@/utils/posts';
+import { getPostAuthors, getPublishedPosts, type Post } from '@/utils/posts';
 
 export const getStaticPaths = (async () => {
   const posts = await getPublishedPosts();
@@ -27,10 +27,9 @@ interface Props {
 const { post, prev, next } = Astro.props;
 const { Content, headings } = await render(post);
 const authors = await getPostAuthors(post);
-const minutes = readingMinutes(post.body);
 ---
 
-<PostLayout post={post} authors={authors} headings={headings} minutes={minutes} prev={prev} next={next}>
+<PostLayout post={post} authors={authors} headings={headings} prev={prev} next={next}>
   <!-- MDX 글에서 import 없이 쓸 수 있는 컴포넌트 -->
   <Content components={{ Callout }} />
 </PostLayout>
