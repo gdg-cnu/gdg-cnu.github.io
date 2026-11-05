@@ -63,8 +63,13 @@ const { prev, next } = Astro.props;
     justify-content: flex-end;
   }
   .post-nav__label {
-    font-size: 0.75rem;
+    font-size: 0.8125rem;
     color: var(--color-text-subtle);
+  }
+  /* 작은 라벨 옆에서도 꺾쇠가 묻히지 않도록 조금 키웁니다. */
+  .post-nav__label :global(.chevron) {
+    width: 0.74em;
+    height: 0.78em;
   }
   .post-nav__title {
     font-weight: 600;
