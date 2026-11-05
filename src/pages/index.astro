@@ -22,9 +22,11 @@ const authors = await getCollection('authors');
   <section class="hero container">
     {
       /*
-        첫 진입 연출: 가운데 붙어 있던 < > 가 양옆으로 열린 뒤 제목이 부드럽게 나타납니다.
-        꺾쇠 위치는 "제목 너비 기준 %"로 움직여서 웹폰트가 언제 로드되든 자리가 맞습니다.
-        제목은 꺾쇠가 거의 다 열렸을 때 나타나므로 꺾쇠가 글자 위를 지나가지 않습니다. (스크립트 없음)
+        첫 진입 연출: 가운데 붙어 있던 < > 가 양옆으로 열리면서, 열린 만큼 제목이 드러납니다.
+        꺾쇠 위치와 드러나는 범위를 모두 "제목 너비 기준"으로 같은 속도로 움직여서
+        웹폰트가 언제 로드되든 꺾쇠와 글자가 겹치지 않습니다.
+        드러나는 경계는 칼로 자른 듯한 선이 아니라 부드럽게 흐려지는 마스크라서,
+        글자가 꺾쇠 사이에서 피어나듯 보입니다. (스크립트 없음)
       */
     }
     <div class="hero__mark">
@@ -96,7 +98,7 @@ const authors = await getCollection('authors');
   .hero__mark {
     --hero-gap: 0.32em;
     --hero-bracket: 0.78em;
-    --hero-ease: cubic-bezier(0.2, 0, 0, 1);
+    --hero-ease: cubic-bezier(0.65, 0, 0.25, 1);
     position: relative;
     /* 양옆 꺾쇠 자리만큼 여백을 둬서 가운데 정렬이 유지되게 합니다. */
     margin-inline: calc(var(--hero-bracket) + var(--hero-gap));
@@ -108,7 +110,19 @@ const authors = await getCollection('authors');
     font-weight: 800;
     letter-spacing: -0.03em;
     white-space: nowrap;
-    animation: hero-title 0.5s var(--ease) 0.6s both;
+    /* 경계 페이드 폭 = 꺾쇠와 제목 사이 간격. 그래서 투명한 끝이 늘 꺾쇠 안쪽 가장자리에 맞습니다. */
+    --hero-fade: 0.32em;
+    --hero-open: calc(100% + 0.64em);
+    --hero-mask: linear-gradient(
+      90deg,
+      transparent calc(50% - var(--hero-open) / 2),
+      #000 calc(50% - var(--hero-open) / 2 + var(--hero-fade)),
+      #000 calc(50% + var(--hero-open) / 2 - var(--hero-fade)),
+      transparent calc(50% + var(--hero-open) / 2)
+    );
+    -webkit-mask-image: var(--hero-mask);
+    mask-image: var(--hero-mask);
+    animation: hero-reveal 0.9s var(--hero-ease) 0.15s both;
   }
   .hero :global(.hero__bracket) {
     position: absolute;
@@ -119,11 +133,11 @@ const authors = await getCollection('authors');
   }
   .hero :global(.hero__bracket--left) {
     right: calc(100% + var(--hero-gap));
-    animation: hero-open-left 0.85s var(--hero-ease) 0.15s both;
+    animation: hero-open-left 0.9s var(--hero-ease) 0.15s both;
   }
   .hero :global(.hero__bracket--right) {
     left: calc(100% + var(--hero-gap));
-    animation: hero-open-right 0.85s var(--hero-ease) 0.15s both;
+    animation: hero-open-right 0.9s var(--hero-ease) 0.15s both;
   }
   .hero__tagline {
     margin: 1rem 0 0;
@@ -150,11 +164,15 @@ const authors = await getCollection('authors');
       left: 50%;
     }
   }
-  /* 제목: 꺾쇠가 거의 열린 뒤 살짝 떠오르며 나타남 */
-  @keyframes hero-title {
+  /* 제목: 꺾쇠와 같은 속도로 가운데부터 드러남 (열린 폭을 애니메이션하려고 등록한 변수) */
+  @property --hero-open {
+    syntax: '<length-percentage>';
+    inherits: false;
+    initial-value: 0%;
+  }
+  @keyframes hero-reveal {
     from {
-      opacity: 0;
-      transform: translateY(0.12em);
+      --hero-open: 0%;
     }
   }
   @keyframes hero-fade {
