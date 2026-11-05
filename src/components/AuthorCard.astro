@@ -17,7 +17,14 @@ const Heading = size === 'lg' ? 'h1' : 'p';
 ---
 
 <section class:list={['author-card', `author-card--${size}`]}>
-  <img src={avatarUrl(author, avatarSize * 2)} alt={`${name} 프로필 이미지`} width={avatarSize} height={avatarSize} loading="lazy" decoding="async" />
+  <img
+    src={avatarUrl(author, avatarSize * 2)}
+    alt={`${name} 프로필 이미지`}
+    width={avatarSize}
+    height={avatarSize}
+    loading={size === 'lg' ? 'eager' : 'lazy'}
+    decoding="async"
+  />
   <div class="author-card__body">
     <Heading class="author-card__name">
       {size === 'md' ? <a href={authorUrl(author)}>{name}</a> : name}
