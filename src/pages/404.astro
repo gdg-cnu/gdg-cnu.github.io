@@ -1,0 +1,54 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+---
+
+<BaseLayout title="페이지를 찾을 수 없어요" noindex>
+  <section class="not-found container container--narrow">
+    <p class="not-found__code">404</p>
+    <div class="brand-dash" aria-hidden="true"><span></span><span></span><span></span><span></span></div>
+    <h1>페이지를 찾을 수 없어요</h1>
+    <p>주소가 바뀌었거나 삭제된 글일 수 있어요.</p>
+    <ul>
+      <li><a href="/">홈으로</a></li>
+      <li><a href="/posts/">모든 글</a></li>
+      <li><a href="/search/">검색하기</a></li>
+    </ul>
+  </section>
+</BaseLayout>
+
+<style>
+  .not-found {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding-top: 6rem;
+    text-align: center;
+  }
+  .not-found__code {
+    margin: 0 0 1rem;
+    font-size: 4rem;
+    font-weight: 800;
+    line-height: 1;
+    letter-spacing: -0.04em;
+  }
+  .not-found h1 {
+    margin: 1.5rem 0 0.5rem;
+    font-size: 1.5rem;
+  }
+  .not-found p {
+    margin: 0;
+    color: var(--color-text-muted);
+  }
+  .not-found ul {
+    display: flex;
+    gap: 1.5rem;
+    margin: 2rem 0 0;
+    padding: 0;
+    list-style: none;
+  }
+  .not-found a {
+    color: var(--color-link);
+    text-decoration: underline;
+    text-underline-offset: 0.2em;
+  }
+</style>
