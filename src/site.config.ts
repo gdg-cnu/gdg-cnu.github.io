@@ -56,7 +56,7 @@ export const SOCIAL = {
  * 표시되는 조회수는 GoatCounter 쪽에서 최대 4시간 캐시되어 바로 반영되지 않을 수 있습니다.
  */
 export const ANALYTICS = {
-  goatcounterCode: '',
+  goatcounterCode: 'gdg-cnu',
 } as const;
 
 /**
