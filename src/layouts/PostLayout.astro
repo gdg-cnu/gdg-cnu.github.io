@@ -7,6 +7,8 @@ import AuthorCard from '@/components/AuthorCard.astro';
 import PostNav from '@/components/PostNav.astro';
 import TagList from '@/components/TagList.astro';
 import Toc from '@/components/Toc.astro';
+import Giscus from '@/components/Giscus.astro';
+import SubscribeBox from '@/components/newsletter/SubscribeBox.astro';
 import type { Author, Post } from '@/utils/posts';
 import { formatDate, isoDate } from '@/utils/date';
 
@@ -97,9 +99,9 @@ const article = {
       <div class="post-footer__authors">
         {authors.map((author) => <AuthorCard author={author} />)}
       </div>
-      <slot name="after-authors" />
+      <SubscribeBox />
       <PostNav prev={prev} next={next} />
-      <slot name="comments" />
+      <Giscus />
     </footer>
   </article>
 </BaseLayout>

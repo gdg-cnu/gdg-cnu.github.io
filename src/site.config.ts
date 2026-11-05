@@ -66,13 +66,19 @@ export const GISCUS = {
 /**
  * 스티비 뉴스레터 구독 설정
  *
- * - subscribeUrl: 스티비 "구독 페이지" 주소 (예: https://page.stibee.com/subscriptions/12345)
- *   값이 있으면 구독 폼에 이메일을 입력하고 버튼을 누를 때 이 페이지가 새 탭으로 열립니다.
- * 비워 두면 구독 박스에 "준비 중" 안내가 표시됩니다.
+ * 두 가지 방법 중 하나를 쓰면 됩니다. (둘 다 있으면 2번이 우선)
+ *
+ * 1. subscribeUrl: 스티비 구독 폼의 공유 링크(구독 페이지 주소)
+ *    → 구독 박스에 "구독하기" 버튼이 생기고, 누르면 스티비 구독 페이지가 새 탭으로 열립니다.
+ *
+ * 2. src/components/newsletter/stibee-embed.html 파일에 스티비 구독 폼의 "HTML 코드"를 붙여넣기
+ *    → 이메일 입력칸이 블로그 안에 바로 들어갑니다. (개인정보 동의 등 스티비 폼 설정이 그대로 적용)
+ *
+ * 둘 다 비어 있으면 구독 박스에 "준비 중" 안내와 RSS 링크가 표시됩니다.
  */
 export const NEWSLETTER = {
   provider: 'stibee',
   subscribeUrl: '',
   title: 'GDG CNU 뉴스레터',
-  description: '새 글과 동아리 소식을 메일로 받아보세요. 스팸 없이, 글이 올라올 때만 보내드려요.',
+  description: '새 글과 동아리 소식을 메일로 받아보세요. 스팸 없이, 소식이 있을 때만 보내드려요.',
 } as const;

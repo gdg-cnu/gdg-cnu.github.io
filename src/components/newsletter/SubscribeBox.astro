@@ -1,0 +1,140 @@
+---
+/**
+ * 뉴스레터 구독 박스 (스티비)
+ * 설정 방법은 src/site.config.ts 의 NEWSLETTER 주석을 참고하세요.
+ */
+import { NEWSLETTER } from '@/site.config';
+import stibeeEmbed from './stibee-embed.html?raw';
+
+const embedHtml = stibeeEmbed.replace(/<!--[\s\S]*?-->/g, '').trim();
+const mode = embedHtml ? 'embed' : NEWSLETTER.subscribeUrl ? 'link' : 'pending';
+---
+
+<section class="subscribe" aria-labelledby="subscribe-title">
+  <div class="subscribe__text">
+    <p class="subscribe__eyebrow">Newsletter</p>
+    <h2 id="subscribe-title">{NEWSLETTER.title}</h2>
+    <p>{NEWSLETTER.description}</p>
+  </div>
+
+  {mode === 'embed' && <div class="subscribe__embed" set:html={embedHtml} />}
+
+  {
+    mode === 'link' && (
+      <div class="subscribe__actions">
+        <a href={NEWSLETTER.subscribeUrl} class="subscribe__button" target="_blank" rel="noopener noreferrer">
+          구독하기 ↗
+        </a>
+        <a href="/rss.xml" class="subscribe__rss">RSS로 구독</a>
+      </div>
+    )
+  }
+
+  {
+    mode === 'pending' && (
+      <div class="subscribe__actions">
+        <span class="subscribe__pending">메일 구독은 준비 중이에요</span>
+        <a href="/rss.xml" class="subscribe__rss">RSS로 구독</a>
+      </div>
+    )
+  }
+</section>
+
+<style>
+  .subscribe {
+    position: relative;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1.25rem 2rem;
+    padding: 1.75rem 1.75rem 1.75rem 2rem;
+    border-radius: var(--radius);
+    background: var(--color-surface);
+    overflow: hidden;
+  }
+  /* 왼쪽 4색 라인 */
+  .subscribe::before {
+    content: '';
+    position: absolute;
+    inset: 0 auto 0 0;
+    width: 4px;
+    background: linear-gradient(
+      to bottom,
+      var(--gdg-blue) 0 25%,
+      var(--gdg-red) 25% 50%,
+      var(--gdg-yellow) 50% 75%,
+      var(--gdg-green) 75% 100%
+    );
+  }
+  .subscribe__text {
+    flex: 1 1 18rem;
+    min-width: 0;
+  }
+  .subscribe__eyebrow {
+    margin: 0;
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--color-text-subtle);
+  }
+  .subscribe h2 {
+    margin: 0.25rem 0 0;
+    font-size: 1.125rem;
+    font-weight: 700;
+  }
+  .subscribe__text p:last-child {
+    margin: 0.35rem 0 0;
+    font-size: 0.9375rem;
+    line-height: 1.6;
+    color: var(--color-text-muted);
+  }
+  .subscribe__actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.75rem 1rem;
+  }
+  .subscribe__button {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.65rem 1.25rem;
+    border-radius: 999px;
+    background: var(--color-text);
+    color: var(--color-bg);
+    font-size: 0.9375rem;
+    font-weight: 600;
+    transition: opacity 0.15s var(--ease);
+  }
+  .subscribe__button:hover {
+    opacity: 0.85;
+  }
+  .subscribe__pending {
+    font-size: 0.875rem;
+    color: var(--color-text-muted);
+  }
+  .subscribe__rss {
+    font-size: 0.875rem;
+    color: var(--color-text-muted);
+    text-decoration: underline;
+    text-underline-offset: 0.2em;
+  }
+  .subscribe__rss:hover {
+    color: var(--color-text);
+  }
+  .subscribe__embed {
+    flex: 1 1 100%;
+    min-width: 0;
+  }
+  /* 스티비 HTML 코드의 기본 스타일을 사이트 톤에 맞춥니다. */
+  .subscribe__embed :global(input[type='email']),
+  .subscribe__embed :global(input[type='text']) {
+    padding: 0.6rem 0.85rem;
+    border: 1px solid var(--color-border-strong);
+    border-radius: var(--radius-sm);
+    background: var(--color-bg);
+    color: var(--color-text);
+    font: inherit;
+  }
+</style>

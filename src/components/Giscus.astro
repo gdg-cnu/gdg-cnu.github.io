@@ -1,0 +1,92 @@
+---
+/**
+ * giscus 댓글 (GitHub Discussions 기반)
+ * 설정값은 src/site.config.ts 의 GISCUS 에 있습니다.
+ * repoId/categoryId가 비어 있으면 "준비 중" 안내만 보여줍니다.
+ */
+import { GISCUS } from '@/site.config';
+
+const ready = Boolean(GISCUS.repoId && GISCUS.categoryId);
+---
+
+<section class="comments" aria-labelledby="comments-title">
+  <h2 id="comments-title" class="comments__title">댓글</h2>
+  {
+    ready ? (
+      <div
+        class="giscus-mount"
+        data-repo={GISCUS.repo}
+        data-repo-id={GISCUS.repoId}
+        data-category={GISCUS.category}
+        data-category-id={GISCUS.categoryId}
+        data-mapping={GISCUS.mapping}
+        data-strict={GISCUS.strict}
+        data-reactions-enabled={GISCUS.reactionsEnabled}
+        data-emit-metadata={GISCUS.emitMetadata}
+        data-input-position={GISCUS.inputPosition}
+        data-lang={GISCUS.lang}
+      >
+        <div class="giscus" />
+      </div>
+    ) : (
+      <p class="comments__pending">댓글 기능은 준비 중이에요.</p>
+    )
+  }
+</section>
+
+<style>
+  .comments__title {
+    margin: 0 0 1rem;
+    font-size: 1.125rem;
+    font-weight: 700;
+  }
+  .comments__pending {
+    margin: 0;
+    padding: 1.25rem;
+    border: 1px dashed var(--color-border-strong);
+    border-radius: var(--radius-sm);
+    color: var(--color-text-subtle);
+    font-size: 0.875rem;
+    text-align: center;
+  }
+</style>
+
+<script>
+  const GISCUS_ORIGIN = 'https://giscus.app';
+  const giscusTheme = (theme: string | undefined) => (theme === 'dark' ? 'noborder_dark' : 'noborder_light');
+
+  const mount = document.querySelector<HTMLElement>('.giscus-mount');
+  if (mount) {
+    const script = document.createElement('script');
+    script.src = `${GISCUS_ORIGIN}/client.js`;
+    script.async = true;
+    script.crossOrigin = 'anonymous';
+    const attrs: Record<string, string | undefined> = {
+      'data-repo': mount.dataset.repo,
+      'data-repo-id': mount.dataset.repoId,
+      'data-category': mount.dataset.category,
+      'data-category-id': mount.dataset.categoryId,
+      'data-mapping': mount.dataset.mapping,
+      'data-strict': mount.dataset.strict,
+      'data-reactions-enabled': mount.dataset.reactionsEnabled,
+      'data-emit-metadata': mount.dataset.emitMetadata,
+      'data-input-position': mount.dataset.inputPosition,
+      'data-lang': mount.dataset.lang,
+      'data-loading': 'lazy',
+      'data-theme': giscusTheme(document.documentElement.dataset.theme),
+    };
+    for (const [key, value] of Object.entries(attrs)) {
+      if (value) script.setAttribute(key, value);
+    }
+    mount.appendChild(script);
+
+    // 사이트 다크 모드를 바꾸면 댓글 테마도 함께 바꿉니다.
+    window.addEventListener('themechange', (event) => {
+      const iframe = document.querySelector<HTMLIFrameElement>('iframe.giscus-frame');
+      iframe?.contentWindow?.postMessage(
+        { giscus: { setConfig: { theme: giscusTheme((event as CustomEvent<string>).detail) } } },
+        GISCUS_ORIGIN,
+      );
+    });
+  }
+</script>
