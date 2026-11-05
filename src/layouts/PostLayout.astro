@@ -178,12 +178,16 @@ const article = {
     display: none;
   }
 
-  @media (min-width: 1260px) {
+  /* 오른쪽 여백이 목차를 담을 만큼 넓을 때만 보여 줍니다.
+     폭을 고정하지 않고 남은 여백에 맞춰 줄어들게 해서, 스크롤바가 있는 환경에서도 화면 밖으로 밀려나지 않습니다. */
+  @media (min-width: 1240px) {
     .post-body__aside {
       display: block;
       grid-column: 3;
-      width: 220px;
-      margin-left: 3.5rem;
+      min-width: 0;
+      max-width: calc(240px + 3.5rem + 1.25rem);
+      padding-left: clamp(1.5rem, 4vw - 1.5rem, 3.5rem);
+      padding-right: 1.25rem;
     }
     .post-body__main :global(.toc--inline) {
       display: none;
