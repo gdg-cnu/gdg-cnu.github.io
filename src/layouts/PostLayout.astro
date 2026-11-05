@@ -21,9 +21,16 @@ interface Props {
 
 const { post, authors, headings, minutes, prev, next } = Astro.props;
 const { title, description, date, updated, tags, thumbnail, thumbnailAlt, draft } = post.data;
+
+const article = {
+  publishedTime: date,
+  modifiedTime: updated,
+  authors: authors.map((author) => ({ name: author.data.name, url: `https://github.com/${author.data.github}` })),
+  tags,
+};
 ---
 
-<BaseLayout title={title} description={description}>
+<BaseLayout title={title} description={description} image={`/og/${post.id}.png`} article={article} noindex={draft}>
   <article class="post">
     <header class="post-header container container--narrow">
       {draft && <p class="post-header__draft">초안 · 배포 시 제외됩니다</p>}
