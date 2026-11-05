@@ -1,0 +1,25 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import PageHeader from '@/components/PageHeader.astro';
+import NewsletterList from '@/components/NewsletterList.astro';
+import SubscribeBox from '@/components/newsletter/SubscribeBox.astro';
+import { getPublishedNewsletters } from '@/utils/posts';
+
+const issues = await getPublishedNewsletters();
+---
+
+<BaseLayout title="뉴스레터" description="GDG on Campus CNU 뉴스레터 지난 호 모음">
+  <div class="container container--narrow">
+    <PageHeader title="뉴스레터" description="새 글과 동아리 소식을 모아 보내 드린 지난 호들이에요." />
+    <NewsletterList issues={issues} />
+    <div class="newsletter-subscribe">
+      <SubscribeBox showArchiveLink={false} />
+    </div>
+  </div>
+</BaseLayout>
+
+<style>
+  .newsletter-subscribe {
+    margin-top: 3rem;
+  }
+</style>

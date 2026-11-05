@@ -57,3 +57,15 @@ export function countByType(posts: Post[]): Record<PostType, number> {
 export function typeUrl(type: PostType): string {
   return `/types/${type}/`;
 }
+
+export type Newsletter = CollectionEntry<'newsletters'>;
+
+/** 공개된 뉴스레터 (최신 회차부터). 개발 서버에서는 draft도 보여줍니다. */
+export async function getPublishedNewsletters(): Promise<Newsletter[]> {
+  const issues = await getCollection('newsletters', ({ data }) => import.meta.env.DEV || !data.draft);
+  return issues.sort((a, b) => b.data.issue - a.data.issue);
+}
+
+export function newsletterUrl(issue: Newsletter): string {
+  return `/newsletter/${issue.data.issue}/`;
+}

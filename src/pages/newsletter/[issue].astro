@@ -1,0 +1,183 @@
+---
+import type { GetStaticPaths } from 'astro';
+import { render } from 'astro:content';
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import Chevron from '@/components/brand/Chevron.astro';
+import Callout from '@/components/mdx/Callout.astro';
+import ViewCount from '@/components/ViewCount.astro';
+import SubscribeBox from '@/components/newsletter/SubscribeBox.astro';
+import { getPublishedNewsletters, newsletterUrl, type Newsletter } from '@/utils/posts';
+import { formatDate, isoDate } from '@/utils/date';
+
+// /newsletter/1/, /newsletter/2/ ...
+export const getStaticPaths = (async () => {
+  const issues = await getPublishedNewsletters();
+  return issues.map((issue, index) => ({
+    params: { issue: String(issue.data.issue) },
+    // issues는 최신 회차부터이므로 index+1이 이전 호입니다.
+    props: { issue, prev: issues[index + 1], next: issues[index - 1] },
+  }));
+}) satisfies GetStaticPaths;
+
+interface Props {
+  issue: Newsletter;
+  prev?: Newsletter;
+  next?: Newsletter;
+}
+
+const { issue, prev, next } = Astro.props;
+const { Content } = await render(issue);
+const { title, description, date, draft } = issue.data;
+const label = `뉴스레터 #${issue.data.issue}`;
+---
+
+<BaseLayout
+  title={`${label} ${title}`}
+  description={description}
+  image={`/og/newsletter/${issue.data.issue}.png`}
+  noindex={draft}
+>
+  <article class="issue container container--narrow" data-pagefind-body>
+    <header class="issue-header">
+      <div hidden data-pagefind-ignore>
+        <span data-pagefind-filter="종류">뉴스레터</span>
+      </div>
+      <a href="/newsletter/" class="issue-header__label" data-pagefind-ignore>{label}</a>
+      <h1>{title}</h1>
+      <p class="issue-header__desc">{description}</p>
+      <div class="issue-header__meta" data-pagefind-ignore>
+        <time datetime={isoDate(date)}>{formatDate(date)}</time>
+        <ViewCount />
+      </div>
+    </header>
+
+    <div class="prose">
+      <Content components={{ Callout }} />
+    </div>
+
+    <footer class="issue-footer" data-pagefind-ignore>
+      <SubscribeBox showArchiveLink={false} />
+      {
+        (prev || next) && (
+          <nav class="issue-nav" aria-label="이전 호, 다음 호">
+            {prev ? (
+              <a href={newsletterUrl(prev)}>
+                <span class="issue-nav__label">
+                  <Chevron side="left" /> 이전 호 #{prev.data.issue}
+                </span>
+                <span class="issue-nav__title">{prev.data.title}</span>
+              </a>
+            ) : (
+              <span />
+            )}
+            {next ? (
+              <a href={newsletterUrl(next)} class="issue-nav__next">
+                <span class="issue-nav__label">
+                  다음 호 #{next.data.issue} <Chevron side="right" />
+                </span>
+                <span class="issue-nav__title">{next.data.title}</span>
+              </a>
+            ) : (
+              <span />
+            )}
+          </nav>
+        )
+      }
+      <a href="/newsletter/" class="issue-footer__all">지난 뉴스레터 모두 보기 <Chevron side="right" /></a>
+    </footer>
+  </article>
+</BaseLayout>
+
+<style>
+  .issue-header {
+    padding-top: 4rem;
+    padding-bottom: 2rem;
+    margin-bottom: 2.5rem;
+    border-bottom: 1px solid var(--color-border);
+  }
+  .issue-header__label {
+    font-family: var(--font-mono);
+    font-size: 0.875rem;
+    color: var(--color-text-muted);
+  }
+  .issue-header__label:hover {
+    color: var(--color-text);
+  }
+  .issue-header h1 {
+    margin: 0.75rem 0 0;
+    font-size: clamp(1.75rem, 4.5vw, 2.5rem);
+    font-weight: 800;
+    line-height: 1.3;
+  }
+  .issue-header__desc {
+    margin: 0.9rem 0 0;
+    font-size: 1.125rem;
+    line-height: 1.6;
+    color: var(--color-text-muted);
+  }
+  .issue-header__meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.55rem;
+    margin-top: 1.25rem;
+    font-size: 0.875rem;
+    color: var(--color-text-muted);
+  }
+  .issue-footer {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+    margin-top: 4rem;
+  }
+  .issue-nav {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+  }
+  .issue-nav a {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+    padding: 1rem 1.15rem;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+  }
+  .issue-nav a:hover {
+    border-color: var(--color-border-strong);
+    background: var(--color-surface);
+  }
+  .issue-nav__next {
+    text-align: right;
+  }
+  .issue-nav__next .issue-nav__label {
+    justify-content: flex-end;
+  }
+  .issue-nav__label {
+    font-size: 0.8125rem;
+    color: var(--color-text-subtle);
+  }
+  .issue-nav__title {
+    font-weight: 600;
+    font-size: 0.9375rem;
+  }
+  .issue-footer__all {
+    align-self: center;
+    font-size: 0.875rem;
+    color: var(--color-text-muted);
+  }
+  .issue-footer__all:hover {
+    color: var(--color-text);
+  }
+  @media (max-width: 560px) {
+    .issue-nav {
+      grid-template-columns: 1fr;
+    }
+    .issue-nav__next {
+      text-align: left;
+    }
+    .issue-nav__next .issue-nav__label {
+      justify-content: flex-start;
+    }
+  }
+</style>

@@ -60,4 +60,21 @@ const posts = defineCollection({
     }),
 });
 
-export const collections = { authors, posts };
+/**
+ * 뉴스레터: src/content/newsletters/<회차>.md
+ * 파일 이름(회차 번호)이 URL이 됩니다. → /newsletter/<회차>/
+ * 스티비로 보낸 회차를 블로그에도 같은 내용으로 남겨 두는 아카이브입니다.
+ */
+const newsletters = defineCollection({
+  loader: glob({ pattern: '*.{md,mdx}', base: './src/content/newsletters' }),
+  schema: z.object({
+    /** 회차 번호 (1, 2, 3 …) */
+    issue: z.number().int().positive(),
+    title: z.string().min(1).max(120),
+    description: z.string().min(1),
+    date: z.coerce.date(),
+    draft: z.boolean().default(false),
+  }),
+});
+
+export const collections = { authors, posts, newsletters };

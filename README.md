@@ -5,7 +5,7 @@
 <h1 align="center">GDG on Campus CNU 기술 블로그</h1>
 
 <p align="center">
-  전남대학교 GDG on Campus 부원들이 배우고 만든 것을 기록하는 기술 블로그이자 뉴스레터입니다.<br />
+  개발에 관심 있는 누구나 함께 배우고 나누는 전남대학교 GDG on Campus의 기술 블로그이자 뉴스레터입니다.<br />
   <a href="https://gdg-cnu.github.io">https://gdg-cnu.github.io</a>
 </p>
 
@@ -19,7 +19,7 @@
 - **기술 블로그 기본기**: 코드 하이라이팅, 목차, 조회수, 태그·작성자별 목록, 페이지네이션
 - **글 종류**: 기술·프로젝트·회고·소식 4가지를 GDG 4색으로 구분하고 종류별로 모아 보기
 - **검색**: [Pagefind](https://pagefind.app) 기반 정적 검색 (서버 없음)
-- **뉴스레터·조회수**: RSS 피드, 스티비 구독 박스, GoatCounter 조회수 (계정·댓글 없는 단방향 블로그)
+- **뉴스레터·조회수**: 회차별 뉴스레터 아카이브(`/newsletter/`), RSS 피드, 스티비 구독 박스, GoatCounter 조회수 (계정·댓글 없는 단방향 블로그)
 - **기본 품질**: 한국어 UI, 반응형, 다크 모드, SEO 메타태그, 글별 OG 이미지 자동 생성, sitemap
 
 ## 기술 스택
@@ -71,6 +71,7 @@ npm run dev   # http://localhost:4321
     ├── content.config.ts         # 글·작성자 frontmatter 스키마
     ├── content/
     │   ├── posts/<slug>/         # 글 (index.md 또는 index.mdx + 이미지)
+    │   ├── newsletters/<회차>.md   # 뉴스레터 회차
     │   └── authors/<github-id>.yaml  # 작성자 정보
     ├── components/               # UI 컴포넌트 (mdx/: 글에서 쓰는 컴포넌트)
     ├── layouts/                  # 기본 레이아웃, 글 레이아웃

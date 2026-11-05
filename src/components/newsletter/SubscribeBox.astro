@@ -5,6 +5,14 @@
  */
 import { NEWSLETTER } from '@/site.config';
 import stibeeEmbed from './stibee-embed.html?raw';
+import Chevron from '../brand/Chevron.astro';
+
+interface Props {
+  /** '지난 뉴스레터 보기' 링크 (뉴스레터 페이지 안에서는 끔) */
+  showArchiveLink?: boolean;
+}
+
+const { showArchiveLink = true } = Astro.props;
 
 const embedHtml = stibeeEmbed.replace(/<!--[\s\S]*?-->/g, '').trim();
 const mode = embedHtml ? 'embed' : NEWSLETTER.subscribeUrl ? 'link' : 'pending';
@@ -15,6 +23,13 @@ const mode = embedHtml ? 'embed' : NEWSLETTER.subscribeUrl ? 'link' : 'pending';
     <p class="subscribe__eyebrow">Newsletter</p>
     <h2 id="subscribe-title">{NEWSLETTER.title}</h2>
     <p>{NEWSLETTER.description}</p>
+    {
+      showArchiveLink && (
+        <a href="/newsletter/" class="subscribe__archive">
+          지난 뉴스레터 보기 <Chevron side="right" />
+        </a>
+      )
+    }
   </div>
 
   {mode === 'embed' && <div class="subscribe__embed" set:html={embedHtml} />}
@@ -74,6 +89,14 @@ const mode = embedHtml ? 'embed' : NEWSLETTER.subscribeUrl ? 'link' : 'pending';
     font-size: 0.9375rem;
     line-height: 1.6;
     color: var(--color-text-muted);
+  }
+  .subscribe__archive {
+    margin-top: 0.6rem;
+    font-size: 0.875rem;
+    color: var(--color-text-muted);
+  }
+  .subscribe__archive:hover {
+    color: var(--color-text);
   }
   .subscribe__actions {
     display: flex;

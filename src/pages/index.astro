@@ -7,14 +7,16 @@ import SubscribeBox from '@/components/newsletter/SubscribeBox.astro';
 import Bracket from '@/components/brand/Bracket.astro';
 import Chevron from '@/components/brand/Chevron.astro';
 import TypeNav from '@/components/TypeNav.astro';
+import NewsletterList from '@/components/NewsletterList.astro';
 import { SITE } from '@/site.config';
-import { collectTags, countByType, getPublishedPosts } from '@/utils/posts';
+import { collectTags, countByType, getPublishedNewsletters, getPublishedPosts } from '@/utils/posts';
 import { authorUrl, avatarUrl } from '@/utils/authors';
 
 const posts = await getPublishedPosts();
 const recent = posts.slice(0, SITE.homePostCount);
 const tags = collectTags(posts).slice(0, 16);
 const typeCounts = countByType(posts);
+const newsletters = (await getPublishedNewsletters()).slice(0, 3);
 const authors = await getCollection('authors');
 
 /*
@@ -111,6 +113,20 @@ const heroTiming = [
       </div>
       <PostList posts={recent} headingLevel="h3" />
     </section>
+
+    {
+      newsletters.length > 0 && (
+        <section aria-labelledby="newsletter-heading">
+          <div class="section-head">
+            <h2 id="newsletter-heading">뉴스레터</h2>
+            <a href="/newsletter/">
+              지난 호 보기 <Chevron side="right" />
+            </a>
+          </div>
+          <NewsletterList issues={newsletters} compact />
+        </section>
+      )
+    }
 
     {
       tags.length > 0 && (

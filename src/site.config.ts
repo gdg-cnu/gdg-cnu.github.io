@@ -14,11 +14,10 @@ export const SITE = {
   /** 좁은 화면용 짧은 이름 */
   brandShort: 'GDG CNU',
   brandSub: 'Tech Blog',
-  description:
-    '전남대학교 GDG on Campus 부원들이 배우고 만든 것을 기록하는 기술 블로그이자 뉴스레터입니다.',
+  description: '개발에 관심 있는 누구나 함께 배우고 나누는 GDG on Campus CNU의 기술 블로그이자 뉴스레터입니다.',
   /** 홈 히어로 */
   heroTitle: 'GDG on Campus CNU',
-  heroTagline: '함께 배우고, 만든 것을 나눕니다.',
+  heroTagline: '개발에 관심 있는 누구나, 함께 배우고 나눕니다.',
   topics: ['DEV', 'AI', 'DATA', 'GAME', 'DESIGN'],
   /** 배포 주소 (astro.config.mjs의 site와 같아야 합니다) */
   url: 'https://gdg-cnu.github.io',
@@ -33,6 +32,7 @@ export const SITE = {
 
 export const NAV: { label: string; href: string }[] = [
   { label: '글', href: '/posts/' },
+  { label: '뉴스레터', href: '/newsletter/' },
   { label: '태그', href: '/tags/' },
   { label: '멤버', href: '/authors/' },
 ];
