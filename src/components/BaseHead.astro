@@ -1,7 +1,7 @@
 ---
 import 'pretendard/dist/web/variable/pretendardvariable-dynamic-subset.css';
 import '@/styles/global.css';
-import { SITE } from '@/site.config';
+import { ANALYTICS, SITE } from '@/site.config';
 
 export interface ArticleMeta {
   publishedTime: Date;
@@ -23,6 +23,9 @@ export interface Props {
 }
 
 const { title, description = SITE.description, image = '/og/default.png', article, noindex = false } = Astro.props;
+
+// 방문 집계는 배포 빌드에서만 켭니다. (로컬 개발 중 방문은 세지 않음)
+const goatcounter = import.meta.env.PROD && ANALYTICS.goatcounterCode;
 
 const fullTitle = title ? `${title} | ${SITE.title}` : SITE.title;
 const canonical = new URL(Astro.url.pathname, Astro.site);
@@ -104,6 +107,12 @@ const jsonLd = article
 <meta name="twitter:image" content={imageUrl} />
 
 <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
+
+{
+  goatcounter && (
+    <script is:inline data-goatcounter={`https://${goatcounter}.goatcounter.com/count`} async src="https://gc.zgo.at/count.js" />
+  )
+}
 
 <!-- 페인트 전에 테마를 적용해 깜빡임을 막습니다. -->
 <script is:inline>

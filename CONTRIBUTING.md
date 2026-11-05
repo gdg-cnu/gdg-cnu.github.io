@@ -237,4 +237,4 @@ http://localhost:4321/posts/<slug>/ 에서 바로 확인할 수 있어요. 저�
 - GDG 브랜드 컬러(파랑·빨강·노랑·초록)는 포인트로만 써 주세요. 본문과 배경은 무채색 계열을 유지합니다.
 - 새 패키지를 추가할 때는 PR 설명에 이유를 적어 주세요.
 
-궁금한 점은 [Discussions](https://github.com/gdg-cnu/gdg-cnu.github.io/discussions)나 동아리 채널에 남겨 주세요. 🙌
+궁금한 점은 [Issues](https://github.com/gdg-cnu/gdg-cnu.github.io/issues)나 동아리 채널에 남겨 주세요. 🙌

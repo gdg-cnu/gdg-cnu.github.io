@@ -1,0 +1,51 @@
+---
+/**
+ * 글 조회수 (GoatCounter 공개 카운터)
+ * src/site.config.ts 의 ANALYTICS.goatcounterCode 가 비어 있으면 아무것도 그리지 않습니다.
+ * 불러오기에 실패하거나 아직 조회 기록이 없으면 숨긴 채로 둡니다.
+ */
+import { ANALYTICS } from '@/site.config';
+
+const code = ANALYTICS.goatcounterCode;
+---
+
+{
+  code && (
+    <span class="view-count" data-goatcounter-code={code} hidden>
+      <span class="view-count__sep" aria-hidden="true">
+        ·
+      </span>
+      <span>
+        조회 <span class="view-count__num" />
+      </span>
+    </span>
+  )
+}
+
+<style>
+  .view-count__sep {
+    margin-right: 0.55rem;
+    color: var(--color-text-subtle);
+  }
+</style>
+
+<script>
+  const el = document.querySelector<HTMLElement>('.view-count');
+  const code = el?.dataset.goatcounterCode;
+  if (el && code) {
+    const path = window.location.pathname;
+    fetch(`https://${code}.goatcounter.com/counter/${encodeURIComponent(path)}.json`)
+      .then((response) => (response.ok ? response.json() : null))
+      .then((data: { count?: string } | null) => {
+        // count는 "1,234" 같은 문자열로 옵니다.
+        const count = Number(String(data?.count ?? '').replace(/\D/g, ''));
+        if (!count) return;
+        const num = el.querySelector('.view-count__num');
+        if (num) num.textContent = count.toLocaleString('ko-KR');
+        el.hidden = false;
+      })
+      .catch(() => {
+        // 조회수는 부가 정보라 실패해도 조용히 넘어갑니다.
+      });
+  }
+</script>

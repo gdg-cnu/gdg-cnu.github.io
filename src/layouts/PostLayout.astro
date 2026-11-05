@@ -6,8 +6,8 @@ import AuthorByline from '@/components/AuthorByline.astro';
 import AuthorCard from '@/components/AuthorCard.astro';
 import PostNav from '@/components/PostNav.astro';
 import TagList from '@/components/TagList.astro';
+import ViewCount from '@/components/ViewCount.astro';
 import Toc from '@/components/Toc.astro';
-import Giscus from '@/components/Giscus.astro';
 import SubscribeBox from '@/components/newsletter/SubscribeBox.astro';
 import type { Author, Post } from '@/utils/posts';
 import { formatDate, isoDate } from '@/utils/date';
@@ -62,6 +62,7 @@ const article = {
         }
         <span class="dot" aria-hidden="true">·</span>
         <span>{minutes}분 분량</span>
+        <ViewCount />
       </div>
     </header>
 
@@ -101,7 +102,6 @@ const article = {
       </div>
       <SubscribeBox />
       <PostNav prev={prev} next={next} />
-      <Giscus />
     </footer>
   </article>
 </BaseLayout>

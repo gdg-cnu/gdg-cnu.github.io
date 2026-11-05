@@ -18,7 +18,7 @@
 - **빌드 단계 검증**: frontmatter 누락, 등록되지 않은 작성자 같은 실수는 PR 체크에서 걸러집니다.
 - **기술 블로그 기본기**: 코드 하이라이팅, 목차, 예상 읽기 시간, 태그·작성자별 목록, 페이지네이션
 - **검색**: [Pagefind](https://pagefind.app) 기반 정적 검색 (서버 없음)
-- **뉴스레터·댓글**: RSS 피드, 스티비 구독 박스, giscus(GitHub Discussions) 댓글
+- **뉴스레터·조회수**: RSS 피드, 스티비 구독 박스, GoatCounter 조회수 (계정·댓글 없는 단방향 블로그)
 - **기본 품질**: 한국어 UI, 반응형, 다크 모드, SEO 메타태그, 글별 OG 이미지 자동 생성, sitemap
 
 ## 기술 스택
@@ -30,7 +30,7 @@
 | 검색 | [Pagefind](https://pagefind.app) |
 | OG 이미지 | [satori](https://github.com/vercel/satori) + [resvg](https://github.com/yisibl/resvg-js) |
 | 폰트 | [Pretendard](https://github.com/orioncactus/pretendard) |
-| 댓글 / 뉴스레터 | [giscus](https://giscus.app) / [스티비](https://stibee.com) |
+| 조회수·방문 분석 / 뉴스레터 | [GoatCounter](https://www.goatcounter.com) / [스티비](https://stibee.com) |
 | 배포 | GitHub Actions → GitHub Pages |
 
 ## 로컬에서 실행하기
@@ -66,7 +66,7 @@ npm run dev   # http://localhost:4321
 ├── scripts/new-post.mjs          # npm run new:post
 ├── templates/post.md             # 새 글 템플릿
 └── src/
-    ├── site.config.ts            # ⭐ 사이트 정보, 메뉴, giscus, 스티비 설정
+    ├── site.config.ts            # ⭐ 사이트 정보, 메뉴, 조회수, 스티비 설정
     ├── content.config.ts         # 글·작성자 frontmatter 스키마
     ├── content/
     │   ├── posts/<slug>/         # 글 (index.md 또는 index.mdx + 이미지)
@@ -83,7 +83,7 @@ npm run dev   # http://localhost:4321
 대부분의 설정은 [`src/site.config.ts`](src/site.config.ts) 한 파일에 있습니다.
 
 - **사이트 정보**: 이름, 소개 문구, 홈 히어로, 페이지당 글 수
-- **giscus 댓글**: `GISCUS.repoId`, `GISCUS.categoryId`를 채우면 댓글이 켜집니다. ([giscus.app](https://giscus.app)에서 확인)
+- **조회수**: `ANALYTICS.goatcounterCode`에 [GoatCounter](https://www.goatcounter.com) 사이트 코드를 넣으면 방문 집계와 글 조회수 표시가 켜집니다. GoatCounter 설정에서 "Allow adding visitor counts on your website"를 켜야 조회수가 보입니다.
 - **스티비 뉴스레터**: `NEWSLETTER.subscribeUrl`에 구독 페이지 주소를 넣거나, `src/components/newsletter/stibee-embed.html`에 스티비 구독 폼 HTML 코드를 붙여넣으세요.
 
 값이 비어 있으면 해당 기능은 "준비 중"으로 표시되고, 빌드는 그대로 통과합니다.

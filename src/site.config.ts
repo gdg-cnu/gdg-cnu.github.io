@@ -1,7 +1,7 @@
 /**
  * 사이트 전역 설정
  *
- * 외부 서비스(giscus 댓글, 스티비 뉴스레터) 설정값도 모두 여기에 있습니다.
+ * 외부 서비스(GoatCounter 조회수, 스티비 뉴스레터) 설정값도 모두 여기에 있습니다.
  * 비밀값이 아니므로 PR로 수정해도 괜찮습니다.
  * 값이 비어 있으면 해당 기능은 화면에서 숨겨지거나 "준비 중"으로 표시되고, 빌드는 그대로 통과합니다.
  */
@@ -45,22 +45,18 @@ export const SOCIAL = {
 } as const;
 
 /**
- * giscus 댓글 설정
- * https://giscus.app 에서 레포와 카테고리를 선택하면 아래 값들을 확인할 수 있습니다.
- * repoId 또는 categoryId가 비어 있으면 댓글 영역에 "준비 중" 안내가 표시됩니다.
+ * 조회수 (GoatCounter)
+ *
+ * 1. https://www.goatcounter.com 에서 사이트를 만들며 code를 정합니다. (예: gdg-cnu → https://gdg-cnu.goatcounter.com)
+ * 2. GoatCounter Settings에서 "Allow adding visitor counts on your website"를 켭니다.
+ * 3. 아래 goatcounterCode에 code를 넣으면 방문 집계와 글 조회수 표시가 켜집니다.
+ *
+ * 비워 두면 집계 스크립트를 넣지 않고 조회수도 표시하지 않습니다.
+ * GoatCounter는 쿠키를 쓰지 않아 쿠키 동의 배너가 필요 없습니다.
+ * 표시되는 조회수는 GoatCounter 쪽에서 최대 4시간 캐시되어 바로 반영되지 않을 수 있습니다.
  */
-export const GISCUS = {
-  repo: 'gdg-cnu/gdg-cnu.github.io',
-  repoId: 'R_kgDOVjhSHw',
-  category: 'Comments',
-  categoryId: 'DIC_kwDOVjhSH84DKbOG',
-  /** 글 URL 경로로 Discussion을 매칭합니다. */
-  mapping: 'pathname',
-  strict: '1',
-  reactionsEnabled: '1',
-  emitMetadata: '0',
-  inputPosition: 'top',
-  lang: 'ko',
+export const ANALYTICS = {
+  goatcounterCode: '',
 } as const;
 
 /**
