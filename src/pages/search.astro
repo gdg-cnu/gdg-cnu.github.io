@@ -1,0 +1,93 @@
+---
+/**
+ * 검색 페이지 (Pagefind)
+ * 검색 인덱스는 `npm run build` 마지막 단계에서 dist/pagefind/ 에 만들어집니다.
+ * 그래서 `npm run dev`에서는 동작하지 않고, `npm run build && npm run preview`로 확인할 수 있습니다.
+ * 주소에 ?q=검색어 를 붙이면 바로 검색합니다.
+ */
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import PageHeader from '@/components/PageHeader.astro';
+---
+
+<BaseLayout title="검색" description="블로그 글을 검색합니다." noindex>
+  <link slot="head" rel="stylesheet" href="/pagefind/pagefind-ui.css" />
+  <div class="container container--narrow">
+    <PageHeader title="검색" />
+    <div id="search" class="search"></div>
+    <p class="search__notice" id="search-notice" hidden>
+      검색 인덱스를 불러오지 못했어요. 로컬에서는 <code>npm run build</code> 후 <code>npm run preview</code>로 확인할 수
+      있어요.
+    </p>
+    <noscript><p class="search__notice">검색 기능을 쓰려면 자바스크립트를 켜 주세요.</p></noscript>
+  </div>
+</BaseLayout>
+
+<script is:inline src="/pagefind/pagefind-ui.js"></script>
+<script is:inline>
+  (() => {
+    if (!('PagefindUI' in window)) {
+      document.getElementById('search-notice').hidden = false;
+      return;
+    }
+    const ui = new window.PagefindUI({
+      element: '#search',
+      showSubResults: true,
+      showImages: false,
+      autofocus: true,
+      excerptLength: 24,
+      translations: {
+        placeholder: '검색어를 입력하세요',
+        zero_results: '[SEARCH_TERM]에 대한 검색 결과가 없어요',
+        many_results: '[SEARCH_TERM]에 대한 검색 결과 [COUNT]개',
+        one_result: '[SEARCH_TERM]에 대한 검색 결과 [COUNT]개',
+        filters_label: '필터',
+      },
+    });
+
+    const params = new URLSearchParams(window.location.search);
+    const query = params.get('q');
+    if (query) ui.triggerSearch(query);
+
+    // 검색어를 주소에 반영해 결과를 공유할 수 있게 합니다.
+    document.querySelector('#search')?.addEventListener('input', (event) => {
+      const target = event.target;
+      if (!(target instanceof HTMLInputElement)) return;
+      const url = new URL(window.location.href);
+      if (target.value) url.searchParams.set('q', target.value);
+      else url.searchParams.delete('q');
+      window.history.replaceState(null, '', url);
+    });
+  })();
+</script>
+
+<style>
+  .search {
+    --pagefind-ui-scale: 0.85;
+    --pagefind-ui-primary: var(--color-accent);
+    --pagefind-ui-text: var(--color-text);
+    --pagefind-ui-background: var(--color-bg);
+    --pagefind-ui-border: var(--color-border-strong);
+    --pagefind-ui-tag: var(--color-surface);
+    --pagefind-ui-border-width: 1px;
+    --pagefind-ui-border-radius: 10px;
+    --pagefind-ui-font: var(--font-sans);
+  }
+  .search :global(.pagefind-ui__result-link) {
+    color: var(--color-text);
+  }
+  .search :global(.pagefind-ui__result-excerpt) {
+    color: var(--color-text-muted);
+  }
+  .search :global(mark) {
+    background: color-mix(in srgb, var(--gdg-yellow) 40%, transparent);
+    color: inherit;
+  }
+  .search__notice {
+    padding: 1.25rem;
+    border-radius: var(--radius-sm);
+    background: var(--color-surface);
+    color: var(--color-text-muted);
+    font-size: 0.9375rem;
+    text-align: center;
+  }
+</style>

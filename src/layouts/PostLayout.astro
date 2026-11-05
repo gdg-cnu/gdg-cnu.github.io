@@ -31,13 +31,20 @@ const article = {
 ---
 
 <BaseLayout title={title} description={description} image={`/og/${post.id}.png`} article={article} noindex={draft}>
-  <article class="post">
+  <!-- data-pagefind-*: 검색(Pagefind)에 글 제목·설명·본문만 색인하고, 태그·작성자는 필터로 씁니다. -->
+  <article class="post" data-pagefind-body>
     <header class="post-header container container--narrow">
-      {draft && <p class="post-header__draft">초안 · 배포 시 제외됩니다</p>}
-      <TagList tags={tags} variant="inline" />
+      {draft && <p class="post-header__draft" data-pagefind-ignore>초안 · 배포 시 제외됩니다</p>}
+      <div data-pagefind-ignore>
+        <TagList tags={tags} variant="inline" />
+      </div>
+      <div hidden data-pagefind-ignore>
+        {tags.map((tag) => <span data-pagefind-filter="태그">{tag}</span>)}
+        {authors.map((author) => <span data-pagefind-filter="작성자">{author.data.name}</span>)}
+      </div>
       <h1>{title}</h1>
       <p class="post-header__desc">{description}</p>
-      <div class="post-header__meta">
+      <div class="post-header__meta" data-pagefind-ignore>
         <AuthorByline authors={authors} />
         <span class="dot" aria-hidden="true">·</span>
         <time datetime={isoDate(date)}>{formatDate(date)}</time>
@@ -58,7 +65,7 @@ const article = {
 
     {
       thumbnail && (
-        <div class="post-thumbnail container container--narrow">
+        <div class="post-thumbnail container container--narrow" data-pagefind-ignore>
           <Image
             src={thumbnail}
             alt={thumbnailAlt ?? ''}
@@ -73,17 +80,19 @@ const article = {
 
     <div class="post-body">
       <div class="post-body__main">
-        <Toc headings={headings} variant="inline" />
+        <div data-pagefind-ignore>
+          <Toc headings={headings} variant="inline" />
+        </div>
         <div class="prose">
           <slot />
         </div>
       </div>
-      <aside class="post-body__aside">
+      <aside class="post-body__aside" data-pagefind-ignore>
         <Toc headings={headings} variant="sidebar" />
       </aside>
     </div>
 
-    <footer class="post-footer container container--narrow">
+    <footer class="post-footer container container--narrow" data-pagefind-ignore>
       <TagList tags={tags} />
       <div class="post-footer__authors">
         {authors.map((author) => <AuthorCard author={author} />)}
