@@ -13,6 +13,7 @@ const isActive = (href: string) => path === href || path.startsWith(href);
     <a href="/" class="brand" aria-label={`${SITE.title} 홈`}>
       <Image src={icon} alt="" width={28} height={28} class="brand__icon" loading="eager" />
       <span class="brand__name">{SITE.brand}</span>
+      <span class="brand__short" aria-hidden="true">{SITE.brandShort}</span>
       <span class="brand__sub">{SITE.brandSub}</span>
     </a>
 
@@ -163,16 +164,19 @@ const isActive = (href: string) => path === href || path.startsWith(href);
       padding: 0.35rem 0.45rem;
     }
   }
+  .brand__short {
+    display: none;
+    font-weight: 700;
+    white-space: nowrap;
+  }
   @media (max-width: 480px) {
     .brand__name {
-      font-size: 0.9375rem;
-    }
-    .site-nav__actions a[href='/rss.xml'] {
       display: none;
     }
-  }
-  @media (max-width: 400px) {
-    .brand__name {
+    .brand__short {
+      display: inline;
+    }
+    .site-nav__actions a[href='/rss.xml'] {
       display: none;
     }
   }

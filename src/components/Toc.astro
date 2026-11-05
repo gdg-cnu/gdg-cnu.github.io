@@ -1,0 +1,139 @@
+---
+import type { MarkdownHeading } from 'astro';
+
+interface Props {
+  headings: MarkdownHeading[];
+  /** sidebar: 넓은 화면 오른쪽 고정 / inline: 본문 위 접이식 */
+  variant: 'sidebar' | 'inline';
+}
+
+const { headings, variant } = Astro.props;
+const items = headings.filter((heading) => heading.depth === 2 || heading.depth === 3);
+---
+
+{
+  items.length >= 2 &&
+    (variant === 'sidebar' ? (
+      <nav class="toc toc--sidebar" aria-label="목차">
+        <p class="toc__title">목차</p>
+        <ol>
+          {items.map((heading) => (
+            <li class={`depth-${heading.depth}`}>
+              <a href={`#${heading.slug}`} data-toc-link={heading.slug}>
+                {heading.text}
+              </a>
+            </li>
+          ))}
+        </ol>
+      </nav>
+    ) : (
+      <details class="toc toc--inline">
+        <summary>목차</summary>
+        <ol>
+          {items.map((heading) => (
+            <li class={`depth-${heading.depth}`}>
+              <a href={`#${heading.slug}`}>{heading.text}</a>
+            </li>
+          ))}
+        </ol>
+      </details>
+    ))
+}
+
+<style>
+  .toc ol {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .toc a {
+    display: block;
+    padding: 0.25rem 0;
+    color: var(--color-text-subtle);
+    font-size: 0.8125rem;
+    line-height: 1.5;
+    transition: color 0.15s var(--ease);
+  }
+  .toc a:hover {
+    color: var(--color-text);
+  }
+  .toc .depth-3 a {
+    padding-left: 0.85rem;
+  }
+
+  .toc--sidebar {
+    position: sticky;
+    top: calc(var(--header-height) + 2rem);
+    max-height: calc(100vh - var(--header-height) - 4rem);
+    overflow-y: auto;
+    padding-left: 1rem;
+    border-left: 1px solid var(--color-border);
+  }
+  .toc__title {
+    margin: 0 0 0.5rem;
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    color: var(--color-text-muted);
+  }
+  .toc--sidebar a.is-active {
+    color: var(--color-accent);
+    font-weight: 600;
+  }
+
+  .toc--inline {
+    margin-bottom: 2.5rem;
+    padding: 0.85rem 1.1rem;
+    border-radius: var(--radius-sm);
+    background: var(--color-surface);
+  }
+  .toc--inline summary {
+    cursor: pointer;
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--color-text-muted);
+  }
+  .toc--inline ol {
+    margin-top: 0.6rem;
+  }
+  .toc--inline a {
+    font-size: 0.875rem;
+  }
+</style>
+
+<script>
+  // 지금 읽고 있는 섹션을 사이드 목차에서 강조합니다.
+  const links = [...document.querySelectorAll<HTMLAnchorElement>('[data-toc-link]')];
+  if (links.length > 0) {
+    const headings = links
+      .map((link) => document.getElementById(link.dataset.tocLink ?? ''))
+      .filter((el): el is HTMLElement => el !== null);
+
+    const setActive = () => {
+      const offset = window.innerHeight * 0.25;
+      let current = headings[0];
+      for (const heading of headings) {
+        if (heading.getBoundingClientRect().top - offset <= 0) current = heading;
+        else break;
+      }
+      for (const link of links) {
+        link.classList.toggle('is-active', link.dataset.tocLink === current?.id);
+      }
+    };
+
+    let ticking = false;
+    window.addEventListener(
+      'scroll',
+      () => {
+        if (ticking) return;
+        ticking = true;
+        requestAnimationFrame(() => {
+          setActive();
+          ticking = false;
+        });
+      },
+      { passive: true },
+    );
+    setActive();
+  }
+</script>

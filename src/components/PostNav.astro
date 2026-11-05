@@ -1,0 +1,79 @@
+---
+import type { Post } from '@/utils/posts';
+
+interface Props {
+  /** 더 오래된 글 */
+  prev?: Post;
+  /** 더 최근 글 */
+  next?: Post;
+}
+
+const { prev, next } = Astro.props;
+---
+
+{
+  (prev || next) && (
+    <nav class="post-nav" aria-label="이전 글, 다음 글">
+      {prev ? (
+        <a href={`/posts/${prev.id}/`} class="post-nav__item post-nav__item--prev">
+          <span class="post-nav__label">← 이전 글</span>
+          <span class="post-nav__title">{prev.data.title}</span>
+        </a>
+      ) : (
+        <span />
+      )}
+      {next ? (
+        <a href={`/posts/${next.id}/`} class="post-nav__item post-nav__item--next">
+          <span class="post-nav__label">다음 글 →</span>
+          <span class="post-nav__title">{next.data.title}</span>
+        </a>
+      ) : (
+        <span />
+      )}
+    </nav>
+  )
+}
+
+<style>
+  .post-nav {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+  }
+  .post-nav__item {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+    padding: 1rem 1.15rem;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    transition:
+      border-color 0.15s var(--ease),
+      background-color 0.15s var(--ease);
+  }
+  .post-nav__item:hover {
+    border-color: var(--color-border-strong);
+    background: var(--color-surface);
+  }
+  .post-nav__item--next {
+    text-align: right;
+  }
+  .post-nav__label {
+    font-size: 0.75rem;
+    color: var(--color-text-subtle);
+  }
+  .post-nav__title {
+    font-weight: 600;
+    font-size: 0.9375rem;
+    line-height: 1.45;
+  }
+
+  @media (max-width: 560px) {
+    .post-nav {
+      grid-template-columns: 1fr;
+    }
+    .post-nav__item--next {
+      text-align: left;
+    }
+  }
+</style>

@@ -1,0 +1,179 @@
+---
+import type { MarkdownHeading } from 'astro';
+import { Image } from 'astro:assets';
+import BaseLayout from './BaseLayout.astro';
+import AuthorByline from '@/components/AuthorByline.astro';
+import AuthorCard from '@/components/AuthorCard.astro';
+import PostNav from '@/components/PostNav.astro';
+import TagList from '@/components/TagList.astro';
+import Toc from '@/components/Toc.astro';
+import type { Author, Post } from '@/utils/posts';
+import { formatDate, isoDate } from '@/utils/date';
+
+interface Props {
+  post: Post;
+  authors: Author[];
+  headings: MarkdownHeading[];
+  minutes: number;
+  prev?: Post;
+  next?: Post;
+}
+
+const { post, authors, headings, minutes, prev, next } = Astro.props;
+const { title, description, date, updated, tags, thumbnail, thumbnailAlt, draft } = post.data;
+---
+
+<BaseLayout title={title} description={description}>
+  <article class="post">
+    <header class="post-header container container--narrow">
+      {draft && <p class="post-header__draft">초안 · 배포 시 제외됩니다</p>}
+      <TagList tags={tags} variant="inline" />
+      <h1>{title}</h1>
+      <p class="post-header__desc">{description}</p>
+      <div class="post-header__meta">
+        <AuthorByline authors={authors} />
+        <span class="dot" aria-hidden="true">·</span>
+        <time datetime={isoDate(date)}>{formatDate(date)}</time>
+        {
+          updated && (
+            <>
+              <span class="dot" aria-hidden="true">·</span>
+              <span>
+                수정 <time datetime={isoDate(updated)}>{formatDate(updated)}</time>
+              </span>
+            </>
+          )
+        }
+        <span class="dot" aria-hidden="true">·</span>
+        <span>{minutes}분 분량</span>
+      </div>
+    </header>
+
+    {
+      thumbnail && (
+        <div class="post-thumbnail container container--narrow">
+          <Image
+            src={thumbnail}
+            alt={thumbnailAlt ?? ''}
+            widths={[720, 1080, 1440]}
+            sizes="(max-width: 760px) 100vw, 720px"
+            loading="eager"
+            fetchpriority="high"
+          />
+        </div>
+      )
+    }
+
+    <div class="post-body">
+      <div class="post-body__main">
+        <Toc headings={headings} variant="inline" />
+        <div class="prose">
+          <slot />
+        </div>
+      </div>
+      <aside class="post-body__aside">
+        <Toc headings={headings} variant="sidebar" />
+      </aside>
+    </div>
+
+    <footer class="post-footer container container--narrow">
+      <TagList tags={tags} />
+      <div class="post-footer__authors">
+        {authors.map((author) => <AuthorCard author={author} />)}
+      </div>
+      <slot name="after-authors" />
+      <PostNav prev={prev} next={next} />
+      <slot name="comments" />
+    </footer>
+  </article>
+</BaseLayout>
+
+<style>
+  .post-header {
+    padding-top: 4rem;
+    padding-bottom: 2.5rem;
+  }
+  .post-header__draft {
+    display: inline-block;
+    margin: 0 0 1rem;
+    padding: 0.2rem 0.6rem;
+    border-radius: 999px;
+    background: color-mix(in srgb, var(--gdg-yellow) 22%, transparent);
+    font-size: 0.75rem;
+    font-weight: 600;
+  }
+  .post-header h1 {
+    margin: 0.75rem 0 0;
+    font-size: clamp(1.75rem, 4.5vw, 2.5rem);
+    font-weight: 800;
+    line-height: 1.3;
+  }
+  .post-header__desc {
+    margin: 0.9rem 0 0;
+    font-size: 1.125rem;
+    line-height: 1.6;
+    color: var(--color-text-muted);
+  }
+  .post-header__meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.4rem 0.55rem;
+    margin-top: 1.75rem;
+    padding-bottom: 1.75rem;
+    border-bottom: 1px solid var(--color-border);
+    font-size: 0.875rem;
+    color: var(--color-text-muted);
+  }
+  .dot {
+    color: var(--color-text-subtle);
+  }
+
+  .post-thumbnail {
+    margin-bottom: 3rem;
+  }
+  .post-thumbnail :global(img) {
+    width: 100%;
+    border-radius: var(--radius);
+  }
+
+  /* 본문은 화면 가운데, 목차는 오른쪽 여백에 둡니다. */
+  .post-body {
+    display: grid;
+    grid-template-columns: 1fr min(var(--content-width), calc(100% - 2.5rem)) 1fr;
+  }
+  .post-body__main {
+    grid-column: 2;
+    min-width: 0;
+  }
+  .post-body__aside {
+    display: none;
+  }
+
+  @media (min-width: 1260px) {
+    .post-body__aside {
+      display: block;
+      grid-column: 3;
+      width: 220px;
+      margin-left: 3.5rem;
+    }
+    .post-body__main :global(.toc--inline) {
+      display: none;
+    }
+  }
+
+  .post-footer {
+    display: flex;
+    flex-direction: column;
+    gap: 2.5rem;
+    margin-top: 4rem;
+  }
+  .post-footer__authors {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    padding: 2rem 0;
+    border-top: 1px solid var(--color-border);
+    border-bottom: 1px solid var(--color-border);
+  }
+</style>

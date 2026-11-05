@@ -1,0 +1,60 @@
+---
+import type { Author } from '@/utils/posts';
+import { authorUrl, avatarUrl } from '@/utils/authors';
+
+interface Props {
+  authors: Author[];
+  size?: number;
+}
+
+const { authors, size = 24 } = Astro.props;
+---
+
+<span class="byline">
+  <span class="byline__avatars" aria-hidden="true">
+    {
+      authors.map((author) => (
+        <img src={avatarUrl(author, size * 2)} alt="" width={size} height={size} loading="lazy" decoding="async" />
+      ))
+    }
+  </span>
+  <span class="byline__names">
+    {
+      authors.map((author, index) => (
+        <>
+          {index > 0 && <span class="byline__sep">, </span>}
+          <a href={authorUrl(author)}>{author.data.name}</a>
+        </>
+      ))
+    }
+  </span>
+</span>
+
+<style>
+  .byline {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    min-width: 0;
+  }
+  .byline__avatars {
+    display: inline-flex;
+    flex-shrink: 0;
+  }
+  .byline__avatars img {
+    border-radius: 50%;
+    background: var(--color-surface);
+    box-shadow: 0 0 0 2px var(--color-bg);
+  }
+  .byline__avatars img + img {
+    margin-left: -0.4rem;
+  }
+  .byline__names a {
+    color: var(--color-text);
+    font-weight: 600;
+  }
+  .byline__names a:hover {
+    text-decoration: underline;
+    text-underline-offset: 0.2em;
+  }
+</style>

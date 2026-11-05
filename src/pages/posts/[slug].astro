@@ -1,0 +1,36 @@
+---
+import type { GetStaticPaths } from 'astro';
+import { render } from 'astro:content';
+import PostLayout from '@/layouts/PostLayout.astro';
+import Callout from '@/components/mdx/Callout.astro';
+import { getPostAuthors, getPublishedPosts, readingMinutes, type Post } from '@/utils/posts';
+
+export const getStaticPaths = (async () => {
+  const posts = await getPublishedPosts();
+  return posts.map((post, index) => ({
+    params: { slug: post.id },
+    props: {
+      post,
+      // posts는 최신순이므로 index+1이 더 오래된 글입니다.
+      prev: posts[index + 1],
+      next: posts[index - 1],
+    },
+  }));
+}) satisfies GetStaticPaths;
+
+interface Props {
+  post: Post;
+  prev?: Post;
+  next?: Post;
+}
+
+const { post, prev, next } = Astro.props;
+const { Content, headings } = await render(post);
+const authors = await getPostAuthors(post);
+const minutes = readingMinutes(post.body);
+---
+
+<PostLayout post={post} authors={authors} headings={headings} minutes={minutes} prev={prev} next={next}>
+  <!-- MDX 글에서 import 없이 쓸 수 있는 컴포넌트 -->
+  <Content components={{ Callout }} />
+</PostLayout>

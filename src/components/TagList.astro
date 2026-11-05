@@ -1,0 +1,96 @@
+---
+import { tagSlug } from '@/utils/posts';
+
+interface Props {
+  tags: readonly string[];
+  /** chip: 둥근 칩 / inline: "태그 / 태그" 형태의 작은 텍스트 */
+  variant?: 'chip' | 'inline';
+  counts?: Record<string, number>;
+}
+
+const { tags, variant = 'chip', counts } = Astro.props;
+---
+
+{
+  tags.length > 0 && (
+    <ul class:list={['tags', `tags--${variant}`]}>
+      {tags.map((tag) => (
+        <li>
+          <a href={`/tags/${tagSlug(tag)}/`}>
+            {variant === 'chip' && <span class="tags__dot" aria-hidden="true" />}
+            {tag}
+            {counts?.[tag] !== undefined && <span class="tags__count">{counts[tag]}</span>}
+          </a>
+        </li>
+      ))}
+    </ul>
+  )
+}
+
+<style>
+  .tags {
+    display: flex;
+    flex-wrap: wrap;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  /* chip */
+  .tags--chip {
+    gap: 0.5rem;
+  }
+  .tags--chip a {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.3rem 0.75rem;
+    border: 1px solid var(--color-border);
+    border-radius: 999px;
+    font-size: 0.8125rem;
+    color: var(--color-text-muted);
+    transition:
+      color 0.15s var(--ease),
+      border-color 0.15s var(--ease),
+      background-color 0.15s var(--ease);
+  }
+  .tags--chip a:hover {
+    color: var(--color-text);
+    border-color: var(--color-border-strong);
+    background: var(--color-surface);
+  }
+  .tags__dot {
+    width: 0.4rem;
+    height: 0.4rem;
+    border-radius: 50%;
+    background: var(--gdg-blue);
+  }
+  .tags--chip li:nth-child(4n + 2) .tags__dot {
+    background: var(--gdg-red);
+  }
+  .tags--chip li:nth-child(4n + 3) .tags__dot {
+    background: var(--gdg-yellow);
+  }
+  .tags--chip li:nth-child(4n + 4) .tags__dot {
+    background: var(--gdg-green);
+  }
+  .tags__count {
+    color: var(--color-text-subtle);
+    font-size: 0.75rem;
+  }
+
+  /* inline */
+  .tags--inline {
+    gap: 0;
+    font-size: 0.8125rem;
+    color: var(--color-text-muted);
+  }
+  .tags--inline li + li::before {
+    content: '/';
+    margin: 0 0.4rem;
+    color: var(--color-text-subtle);
+  }
+  .tags--inline a:hover {
+    color: var(--color-text);
+  }
+</style>

@@ -1,0 +1,98 @@
+---
+import type { Author } from '@/utils/posts';
+import { authorUrl, avatarUrl } from '@/utils/authors';
+
+interface Props {
+  author: Author;
+  /** 작성자 페이지 상단처럼 크게 보여줄 때 */
+  size?: 'md' | 'lg';
+  /** "글 더 보기" 링크 표시 */
+  showPostsLink?: boolean;
+}
+
+const { author, size = 'md', showPostsLink = true } = Astro.props;
+const { name, github, bio, role, links } = author.data;
+const avatarSize = size === 'lg' ? 88 : 56;
+const Heading = size === 'lg' ? 'h1' : 'p';
+---
+
+<section class:list={['author-card', `author-card--${size}`]}>
+  <img src={avatarUrl(author, avatarSize * 2)} alt={`${name} 프로필 이미지`} width={avatarSize} height={avatarSize} loading="lazy" decoding="async" />
+  <div class="author-card__body">
+    <Heading class="author-card__name">
+      {size === 'md' ? <a href={authorUrl(author)}>{name}</a> : name}
+      {role && <span class="author-card__role">{role}</span>}
+    </Heading>
+    {bio && <p class="author-card__bio">{bio}</p>}
+    <ul class="author-card__links">
+      <li><a href={`https://github.com/${github}`} target="_blank" rel="noopener noreferrer">GitHub ↗</a></li>
+      {links?.website && <li><a href={links.website} target="_blank" rel="noopener noreferrer">Website ↗</a></li>}
+      {links?.linkedin && <li><a href={links.linkedin} target="_blank" rel="noopener noreferrer">LinkedIn ↗</a></li>}
+      {links?.email && <li><a href={`mailto:${links.email}`}>Email</a></li>}
+      {showPostsLink && size === 'md' && <li><a href={authorUrl(author)}>작성한 글 →</a></li>}
+    </ul>
+  </div>
+</section>
+
+<style>
+  .author-card {
+    display: flex;
+    gap: 1.1rem;
+    align-items: flex-start;
+  }
+  .author-card img {
+    flex-shrink: 0;
+    border-radius: 50%;
+    background: var(--color-surface);
+  }
+  .author-card__body {
+    min-width: 0;
+  }
+  .author-card__name {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0.5rem;
+    margin: 0;
+    font-size: 1.0625rem;
+    font-weight: 700;
+    line-height: 1.4;
+  }
+  .author-card__name a:hover {
+    text-decoration: underline;
+    text-underline-offset: 0.2em;
+  }
+  .author-card--lg .author-card__name {
+    font-size: 1.75rem;
+    font-weight: 800;
+  }
+  .author-card__role {
+    font-size: 0.8125rem;
+    font-weight: 500;
+    color: var(--color-text-muted);
+  }
+  .author-card__bio {
+    margin: 0.35rem 0 0;
+    color: var(--color-text-muted);
+    font-size: 0.9375rem;
+    line-height: 1.6;
+  }
+  .author-card__links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.25rem 1rem;
+    margin: 0.6rem 0 0;
+    padding: 0;
+    list-style: none;
+    font-size: 0.8125rem;
+  }
+  .author-card__links a {
+    color: var(--color-text-subtle);
+  }
+  .author-card__links a:hover {
+    color: var(--color-text);
+  }
+  .author-card--lg {
+    align-items: center;
+  }
+</style>

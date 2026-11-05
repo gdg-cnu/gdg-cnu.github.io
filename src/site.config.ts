@@ -11,6 +11,8 @@ export const SITE = {
   title: 'GDG on Campus CNU 기술 블로그',
   /** 헤더 워드마크 */
   brand: 'GDG on Campus CNU',
+  /** 좁은 화면용 짧은 이름 */
+  brandShort: 'GDG CNU',
   brandSub: 'Tech Blog',
   description:
     '전남대학교 GDG on Campus 부원들이 배우고 만든 것을 기록하는 기술 블로그이자 뉴스레터입니다.',
