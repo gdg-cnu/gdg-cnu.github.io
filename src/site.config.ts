@@ -51,9 +51,9 @@ export const SOCIAL = {
  */
 export const GISCUS = {
   repo: 'gdg-cnu/gdg-cnu.github.io',
-  repoId: '',
+  repoId: 'R_kgDOVjhSHw',
   category: 'Comments',
-  categoryId: '',
+  categoryId: 'DIC_kwDOVjhSH84DKbOG',
   /** 글 URL 경로로 Discussion을 매칭합니다. */
   mapping: 'pathname',
   strict: '1',

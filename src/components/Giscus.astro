@@ -80,13 +80,24 @@ const ready = Boolean(GISCUS.repoId && GISCUS.categoryId);
     }
     mount.appendChild(script);
 
-    // 사이트 다크 모드를 바꾸면 댓글 테마도 함께 바꿉니다.
-    window.addEventListener('themechange', (event) => {
+    const syncTheme = () => {
       const iframe = document.querySelector<HTMLIFrameElement>('iframe.giscus-frame');
       iframe?.contentWindow?.postMessage(
-        { giscus: { setConfig: { theme: giscusTheme((event as CustomEvent<string>).detail) } } },
+        { giscus: { setConfig: { theme: giscusTheme(document.documentElement.dataset.theme) } } },
         GISCUS_ORIGIN,
       );
-    });
+    };
+
+    // 사이트 다크 모드를 바꾸면 댓글 테마도 함께 바꿉니다.
+    window.addEventListener('themechange', syncTheme);
+
+    // 댓글 창은 스크롤해서 보일 때 로딩됩니다(lazy). 그 전에 테마를 바꿨다면 메시지가 사라지므로,
+    // 댓글 창이 로딩을 마치고 처음 보내는 메시지를 받으면 현재 테마를 한 번 더 맞춥니다.
+    const onGiscusReady = (event: MessageEvent) => {
+      if (event.origin !== GISCUS_ORIGIN) return;
+      window.removeEventListener('message', onGiscusReady);
+      syncTheme();
+    };
+    window.addEventListener('message', onGiscusReady);
   }
 </script>
