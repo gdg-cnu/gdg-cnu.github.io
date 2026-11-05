@@ -5,7 +5,7 @@ import Bracket from '@/components/brand/Bracket.astro';
 
 <BaseLayout title="페이지를 찾을 수 없어요" noindex>
   <section class="not-found container container--narrow">
-    {/* 로고 꺾쇠가 흐트러진 채 떠다니는 연출. 마우스를 올리면 멈춥니다. */}
+    {/* 로고 꺾쇠가 흐트러진 채 떠다니는 연출 */}
     <div class="not-found__mark" aria-hidden="true">
       <Bracket side="left" drift class="not-found__bracket" />
       <span class="not-found__code">404</span>
@@ -55,9 +55,6 @@ import Bracket from '@/components/brand/Bracket.astro';
   .not-found :global(.bracket--right .bracket-piece--1) {
     animation-name: drift-b;
     animation-duration: 2.9s;
-  }
-  .not-found__mark:hover :global(.bracket-piece) {
-    animation-play-state: paused;
   }
   @keyframes drift-a {
     from {
