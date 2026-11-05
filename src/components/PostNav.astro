@@ -59,6 +59,9 @@ const { prev, next } = Astro.props;
   .post-nav__item--next {
     text-align: right;
   }
+  .post-nav__item--next .post-nav__label {
+    justify-content: flex-end;
+  }
   .post-nav__label {
     font-size: 0.75rem;
     color: var(--color-text-subtle);
@@ -75,6 +78,9 @@ const { prev, next } = Astro.props;
     }
     .post-nav__item--next {
       text-align: left;
+    }
+    .post-nav__item--next .post-nav__label {
+      justify-content: flex-start;
     }
   }
 </style>

@@ -381,12 +381,20 @@ a:focus-visible > .brand-mark .brand-mark__right {
   transform: translateX(16px);
 }
 
-/* 이동 화살표: 링크에 마우스를 올리면 화살표 방향으로 살짝 움직입니다. */
+/* 이동 화살표: 링크에 마우스를 올리면 화살표 방향으로 살짝 움직입니다.
+   화살표를 담은 요소는 글자 줄 가운데에 화살표를 맞추도록 inline-flex로 둡니다. */
+:where(a, span):has(> .chevron) {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3em;
+}
 .chevron {
-  display: inline-block;
+  position: relative;
+  /* 한글은 글자 줄 가운데보다 살짝 위에 무게가 있어서 0.04em 올려 맞춥니다. */
+  top: -0.04em;
+  flex-shrink: 0;
   width: 0.62em;
   height: 0.66em;
-  vertical-align: -0.04em;
   transition: transform 0.25s var(--ease);
 }
 .chevron .bracket-pill {
