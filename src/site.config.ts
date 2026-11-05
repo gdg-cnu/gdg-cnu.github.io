@@ -37,6 +37,22 @@ export const NAV: { label: string; href: string }[] = [
   { label: '멤버', href: '/authors/' },
 ];
 
+/**
+ * 글 종류
+ * GDG 4색은 장식이 아니라 "글의 종류"를 나타내는 데만 씁니다.
+ * 분야(웹, 디자인, 게임, AI …)는 종류와 별개로 tags에 자유롭게 적습니다.
+ * 글 frontmatter의 type 값이 아래 키 중 하나여야 하며, 비우면 tech(기술)입니다.
+ */
+export const POST_TYPES = {
+  tech: { label: '기술', color: 'var(--gdg-blue)', description: '개념 정리, 튜토리얼, 트러블슈팅' },
+  project: { label: '프로젝트', color: 'var(--gdg-green)', description: '만든 것 소개, 개발기, 케이스 스터디' },
+  retro: { label: '회고', color: 'var(--gdg-yellow)', description: '회고, 에세이, 성장 이야기' },
+  news: { label: '소식', color: 'var(--gdg-red)', description: '행사·세미나 후기, 동아리 공지' },
+} as const;
+
+export type PostType = keyof typeof POST_TYPES;
+export const POST_TYPE_KEYS = Object.keys(POST_TYPES) as [PostType, ...PostType[]];
+
 export const SOCIAL = {
   github: 'https://github.com/gdg-cnu',
   /** GDG 커뮤니티 페이지 등. 비워 두면 표시하지 않습니다. */

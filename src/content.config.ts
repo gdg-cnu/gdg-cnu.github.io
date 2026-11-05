@@ -1,6 +1,7 @@
 import { defineCollection, reference } from 'astro:content';
 import { glob } from 'astro/loaders';
 import { z } from 'astro/zod';
+import { POST_TYPE_KEYS } from './site.config';
 
 /**
  * 작성자: src/content/authors/<GitHub ID>.yaml
@@ -48,6 +49,8 @@ const posts = defineCollection({
       author: z
         .union([reference('authors'), z.array(reference('authors')).min(1)])
         .transform((value) => (Array.isArray(value) ? value : [value])),
+      /** 글 종류: tech(기술) · project(프로젝트) · retro(회고) · news(소식). site.config.ts의 POST_TYPES 참고 */
+      type: z.enum(POST_TYPE_KEYS).default('tech'),
       tags: z.array(z.string().trim().min(1)).default([]),
       /** 글 폴더 안의 이미지 경로 (예: ./cover.png) */
       thumbnail: image().optional(),

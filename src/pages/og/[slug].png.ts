@@ -1,6 +1,7 @@
 import type { APIRoute, GetStaticPaths } from 'astro';
 import { getPostAuthors, getPublishedPosts, type Post } from '@/utils/posts';
 import { formatDate } from '@/utils/date';
+import { POST_TYPES } from '@/site.config';
 import { renderOgImage } from '@/utils/og';
 
 // /og/<글 slug>.png
@@ -14,7 +15,7 @@ export const GET: APIRoute<{ post: Post }> = async ({ props }) => {
   const authors = await getPostAuthors(post);
   const png = await renderOgImage({
     title: post.data.title,
-    subtitle: post.data.tags.map((tag) => `#${tag}`).join('  '),
+    subtitle: [POST_TYPES[post.data.type].label, ...post.data.tags.map((tag) => `#${tag}`)].join('  '),
     meta: `${authors.map((author) => author.data.name).join(', ')} · ${formatDate(post.data.date)}`,
   });
   return new Response(png, { headers: { 'Content-Type': 'image/png' } });

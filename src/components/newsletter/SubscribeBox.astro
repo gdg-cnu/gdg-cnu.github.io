@@ -48,24 +48,9 @@ const mode = embedHtml ? 'embed' : NEWSLETTER.subscribeUrl ? 'link' : 'pending';
     align-items: center;
     justify-content: space-between;
     gap: 1.25rem 2rem;
-    padding: 1.75rem 1.75rem 1.75rem 2rem;
+    padding: 1.75rem;
     border-radius: var(--radius);
     background: var(--color-surface);
-    overflow: hidden;
-  }
-  /* 왼쪽 4색 라인 */
-  .subscribe::before {
-    content: '';
-    position: absolute;
-    inset: 0 auto 0 0;
-    width: 4px;
-    background: linear-gradient(
-      to bottom,
-      var(--gdg-blue) 0 25%,
-      var(--gdg-red) 25% 50%,
-      var(--gdg-yellow) 50% 75%,
-      var(--gdg-green) 75% 100%
-    );
   }
   .subscribe__text {
     flex: 1 1 18rem;

@@ -3,6 +3,7 @@ title: GDG on Campus CNU 기술 블로그를 시작합니다
 description: 부원들이 배우고 만든 것을 기록하고 나누기 위한 기술 블로그와 뉴스레터를 소개합니다.
 date: 2026-11-03
 author: skrudwns
+type: news
 tags:
   - 공지
   - 블로그

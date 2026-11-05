@@ -3,6 +3,8 @@ title: {{title}}
 description: {{description}}
 date: {{date}}
 author: {{author}}
+# 글 종류: tech(기술) · project(프로젝트) · retro(회고) · news(소식)
+type: {{type}}
 tags:
 {{tags}}
 # 썸네일을 쓰려면 이미지를 이 폴더에 넣고 아래 주석을 푸세요. (권장 비율 16:9 또는 16:10)

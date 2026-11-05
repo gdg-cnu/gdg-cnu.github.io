@@ -162,30 +162,6 @@ h4 {
   max-width: calc(var(--content-width) + 2.5rem);
 }
 
-/* 페이지 제목 아래 4색 대시 */
-.brand-dash {
-  display: flex;
-  width: 2.5rem;
-  height: 3px;
-  border-radius: 2px;
-  overflow: hidden;
-}
-.brand-dash > span {
-  flex: 1;
-}
-.brand-dash > span:nth-child(1) {
-  background: var(--gdg-blue);
-}
-.brand-dash > span:nth-child(2) {
-  background: var(--gdg-red);
-}
-.brand-dash > span:nth-child(3) {
-  background: var(--gdg-yellow);
-}
-.brand-dash > span:nth-child(4) {
-  background: var(--gdg-green);
-}
-
 /* 섹션 헤더: "최근 글 · 전체 보기 →" */
 .section-head {
   display: flex;

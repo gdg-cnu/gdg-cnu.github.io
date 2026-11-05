@@ -12,7 +12,6 @@ const { title, description, eyebrow } = Astro.props;
 <header class="page-header">
   {eyebrow && <p class="page-header__eyebrow">{eyebrow}</p>}
   <h1>{title}</h1>
-  <div class="brand-dash" aria-hidden="true"><span></span><span></span><span></span><span></span></div>
   {description && <p class="page-header__desc">{description}</p>}
   <slot />
 </header>
@@ -31,12 +30,12 @@ const { title, description, eyebrow } = Astro.props;
     color: var(--color-text-subtle);
   }
   .page-header h1 {
-    margin: 0 0 1rem;
+    margin: 0;
     font-size: clamp(1.75rem, 4vw, 2.25rem);
     font-weight: 800;
   }
   .page-header__desc {
-    margin: 1rem 0 0;
+    margin: 0.6rem 0 0;
     color: var(--color-text-muted);
   }
 </style>

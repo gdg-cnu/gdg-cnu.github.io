@@ -4,31 +4,47 @@ import BaseLayout from '@/layouts/BaseLayout.astro';
 import PageHeader from '@/components/PageHeader.astro';
 import PostList from '@/components/PostList.astro';
 import Pagination from '@/components/Pagination.astro';
-import { getPublishedPosts, type Post } from '@/utils/posts';
+import TypeNav from '@/components/TypeNav.astro';
+import { countByType, getPublishedPosts, type Post } from '@/utils/posts';
 import { paginate, type PageInfo } from '@/utils/pagination';
+import type { PostType } from '@/site.config';
 
 // /posts/, /posts/page/2/, /posts/page/3/ ...
 export const getStaticPaths = (async () => {
   const posts = await getPublishedPosts();
+  const counts = countByType(posts);
   return paginate(posts, '/posts/').map(({ param, items, info }) => ({
     params: { page: param },
-    props: { posts: items, info },
+    props: { posts: items, info, counts },
   }));
 }) satisfies GetStaticPaths;
 
 interface Props {
   posts: Post[];
   info: PageInfo;
+  counts: Record<PostType, number>;
 }
 
-const { posts, info } = Astro.props;
+const { posts, info, counts } = Astro.props;
 const pageTitle = info.current > 1 ? `모든 글 (${info.current}페이지)` : '모든 글';
 ---
 
 <BaseLayout title={pageTitle} description={`GDG on Campus CNU 기술 블로그의 글 ${info.total}개`}>
   <div class="container container--narrow">
     <PageHeader title="모든 글" description={`${info.total}개의 글`} />
+    <div class="list-filter">
+      <TypeNav counts={counts} total={info.total} current="all" />
+    </div>
     <PostList posts={posts} />
     <Pagination info={info} />
   </div>
 </BaseLayout>
+
+<style>
+  .list-filter {
+    display: flex;
+    justify-content: center;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid var(--color-border);
+  }
+</style>

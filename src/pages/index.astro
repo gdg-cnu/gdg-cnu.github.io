@@ -6,13 +6,15 @@ import TagList from '@/components/TagList.astro';
 import SubscribeBox from '@/components/newsletter/SubscribeBox.astro';
 import Bracket from '@/components/brand/Bracket.astro';
 import Chevron from '@/components/brand/Chevron.astro';
+import TypeNav from '@/components/TypeNav.astro';
 import { SITE } from '@/site.config';
-import { collectTags, getPublishedPosts } from '@/utils/posts';
+import { collectTags, countByType, getPublishedPosts } from '@/utils/posts';
 import { authorUrl, avatarUrl } from '@/utils/authors';
 
 const posts = await getPublishedPosts();
 const recent = posts.slice(0, SITE.homePostCount);
 const tags = collectTags(posts).slice(0, 16);
+const typeCounts = countByType(posts);
 const authors = await getCollection('authors');
 ---
 
@@ -39,6 +41,9 @@ const authors = await getCollection('authors');
       <div class="section-head">
         <h2 id="recent-heading">최근 글</h2>
         <a href="/posts/">전체 보기 <Chevron side="right" /></a>
+      </div>
+      <div class="home__types">
+        <TypeNav counts={typeCounts} total={posts.length} />
       </div>
       <PostList posts={recent} headingLevel="h3" />
     </section>
@@ -168,6 +173,9 @@ const authors = await getCollection('authors');
     display: flex;
     flex-direction: column;
     gap: 4.5rem;
+  }
+  .home__types {
+    margin: 0.75rem 0 0.25rem;
   }
   .home__tags {
     margin-top: 1rem;

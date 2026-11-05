@@ -1,0 +1,55 @@
+---
+import type { GetStaticPaths } from 'astro';
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import PageHeader from '@/components/PageHeader.astro';
+import PostList from '@/components/PostList.astro';
+import Pagination from '@/components/Pagination.astro';
+import TypeNav from '@/components/TypeNav.astro';
+import { POST_TYPE_KEYS, POST_TYPES, type PostType } from '@/site.config';
+import { countByType, getPublishedPosts, typeUrl, type Post } from '@/utils/posts';
+import { paginate, type PageInfo } from '@/utils/pagination';
+
+// /types/tech/, /types/tech/page/2/ ... (글이 없는 종류도 페이지를 만들어 둡니다)
+export const getStaticPaths = (async () => {
+  const posts = await getPublishedPosts();
+  const counts = countByType(posts);
+  return POST_TYPE_KEYS.flatMap((type) => {
+    const typed = posts.filter((post) => post.data.type === type);
+    return paginate(typed, typeUrl(type)).map(({ param, items, info }) => ({
+      params: { type, page: param },
+      props: { type, posts: items, info, counts, total: posts.length },
+    }));
+  });
+}) satisfies GetStaticPaths;
+
+interface Props {
+  type: PostType;
+  posts: Post[];
+  info: PageInfo;
+  counts: Record<PostType, number>;
+  total: number;
+}
+
+const { type, posts, info, counts, total } = Astro.props;
+const { label, description } = POST_TYPES[type];
+---
+
+<BaseLayout title={`${label} 글`} description={`${label}: ${description}`}>
+  <div class="container container--narrow">
+    <PageHeader eyebrow="글 종류" title={label} description={description} />
+    <div class="list-filter">
+      <TypeNav counts={counts} total={total} current={type} />
+    </div>
+    <PostList posts={posts} emptyMessage={`아직 '${label}' 글이 없어요.`} />
+    <Pagination info={info} />
+  </div>
+</BaseLayout>
+
+<style>
+  .list-filter {
+    display: flex;
+    justify-content: center;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid var(--color-border);
+  }
+</style>

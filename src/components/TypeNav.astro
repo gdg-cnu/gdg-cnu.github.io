@@ -1,0 +1,90 @@
+---
+/**
+ * 글 종류 필터: [전체] [● 기술] [● 프로젝트] [● 회고] [● 소식]
+ * 각 칩은 /posts/ 또는 /types/<종류>/ 페이지로 이동합니다.
+ */
+import { POST_TYPE_KEYS, POST_TYPES, type PostType } from '@/site.config';
+import { typeUrl } from '@/utils/posts';
+
+interface Props {
+  counts: Record<PostType, number>;
+  total: number;
+  /** 지금 보고 있는 종류. 전체 목록이면 'all' */
+  current?: PostType | 'all';
+  /** 개수 표시 여부 */
+  showCounts?: boolean;
+}
+
+const { counts, total, current, showCounts = true } = Astro.props;
+---
+
+<nav class="type-nav" aria-label="글 종류">
+  <ul>
+    <li>
+      <a href="/posts/" aria-current={current === 'all' ? 'page' : undefined}>
+        전체{showCounts && <span class="type-nav__count">{total}</span>}
+      </a>
+    </li>
+    {
+      POST_TYPE_KEYS.map((key) => (
+        <li>
+          <a
+            href={typeUrl(key)}
+            aria-current={current === key ? 'page' : undefined}
+            style={`--type-color:${POST_TYPES[key].color}`}
+          >
+            <span class="type-nav__dot" aria-hidden="true" />
+            {POST_TYPES[key].label}
+            {showCounts && <span class="type-nav__count">{counts[key]}</span>}
+          </a>
+        </li>
+      ))
+    }
+  </ul>
+</nav>
+
+<style>
+  .type-nav ul {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .type-nav a {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    padding: 0.35rem 0.85rem;
+    border: 1px solid var(--color-border);
+    border-radius: 999px;
+    font-size: 0.875rem;
+    color: var(--color-text-muted);
+    transition:
+      color 0.15s var(--ease),
+      border-color 0.15s var(--ease),
+      background-color 0.15s var(--ease);
+  }
+  .type-nav a:hover {
+    color: var(--color-text);
+    border-color: var(--color-border-strong);
+    background: var(--color-surface);
+  }
+  .type-nav a[aria-current='page'] {
+    color: var(--color-text);
+    border-color: var(--color-text);
+    font-weight: 600;
+  }
+  .type-nav__dot {
+    width: 0.5rem;
+    height: 0.5rem;
+    border-radius: 50%;
+    background: var(--type-color);
+  }
+  .type-nav__count {
+    font-size: 0.75rem;
+    font-weight: 400;
+    color: var(--color-text-subtle);
+  }
+</style>

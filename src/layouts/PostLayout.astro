@@ -6,6 +6,8 @@ import AuthorByline from '@/components/AuthorByline.astro';
 import AuthorCard from '@/components/AuthorCard.astro';
 import PostNav from '@/components/PostNav.astro';
 import TagList from '@/components/TagList.astro';
+import PostTypeLabel from '@/components/PostTypeLabel.astro';
+import { POST_TYPES } from '@/site.config';
 import ViewCount from '@/components/ViewCount.astro';
 import Toc from '@/components/Toc.astro';
 import SubscribeBox from '@/components/newsletter/SubscribeBox.astro';
@@ -22,7 +24,7 @@ interface Props {
 }
 
 const { post, authors, headings, minutes, prev, next } = Astro.props;
-const { title, description, date, updated, tags, thumbnail, thumbnailAlt, draft } = post.data;
+const { title, description, date, updated, type, tags, thumbnail, thumbnailAlt, draft } = post.data;
 
 const article = {
   publishedTime: date,
@@ -37,10 +39,13 @@ const article = {
   <article class="post" data-pagefind-body>
     <header class="post-header container container--narrow">
       {draft && <p class="post-header__draft" data-pagefind-ignore>초안 · 배포 시 제외됩니다</p>}
-      <div data-pagefind-ignore>
+      <div class="post-header__kicker" data-pagefind-ignore>
+        <PostTypeLabel type={type} />
+        {tags.length > 0 && <span class="dot" aria-hidden="true">·</span>}
         <TagList tags={tags} variant="inline" />
       </div>
       <div hidden data-pagefind-ignore>
+        <span data-pagefind-filter="종류">{POST_TYPES[type].label}</span>
         {tags.map((tag) => <span data-pagefind-filter="태그">{tag}</span>)}
         {authors.map((author) => <span data-pagefind-filter="작성자">{author.data.name}</span>)}
       </div>
@@ -119,6 +124,14 @@ const article = {
     background: color-mix(in srgb, var(--gdg-yellow) 22%, transparent);
     font-size: 0.75rem;
     font-weight: 600;
+  }
+  .post-header__kicker {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.45rem;
+    font-size: 0.875rem;
+    color: var(--color-text-muted);
   }
   .post-header h1 {
     margin: 0.75rem 0 0;

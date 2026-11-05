@@ -1,0 +1,42 @@
+---
+/**
+ * 글 종류 표시: ● 기술
+ * 점 색이 글 종류를 나타냅니다. (site.config.ts의 POST_TYPES)
+ */
+import { POST_TYPES, type PostType } from '@/site.config';
+import { typeUrl } from '@/utils/posts';
+
+interface Props {
+  type: PostType;
+  /** 링크 없이 글자만 */
+  plain?: boolean;
+}
+
+const { type, plain = false } = Astro.props;
+const { label, color } = POST_TYPES[type];
+const Tag = plain ? 'span' : 'a';
+---
+
+<Tag class="post-type" href={plain ? undefined : typeUrl(type)} style={`--type-color:${color}`}>
+  <span class="post-type__dot" aria-hidden="true"></span>{label}
+</Tag>
+
+<style>
+  .post-type {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4em;
+    font-weight: 600;
+    color: var(--color-text);
+  }
+  a.post-type:hover {
+    text-decoration: underline;
+    text-underline-offset: 0.2em;
+  }
+  .post-type__dot {
+    width: 0.5em;
+    height: 0.5em;
+    border-radius: 50%;
+    background: var(--type-color);
+  }
+</style>

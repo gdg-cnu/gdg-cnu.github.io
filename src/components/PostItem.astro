@@ -2,6 +2,7 @@
 import { Image } from 'astro:assets';
 import AuthorByline from './AuthorByline.astro';
 import TagList from './TagList.astro';
+import PostTypeLabel from './PostTypeLabel.astro';
 import { getPostAuthors, readingMinutes, type Post } from '@/utils/posts';
 import { formatDate, isoDate } from '@/utils/date';
 
@@ -12,7 +13,7 @@ interface Props {
 }
 
 const { post, headingLevel = 'h2' } = Astro.props;
-const { title, description, date, tags, thumbnail, thumbnailAlt, draft } = post.data;
+const { title, description, date, type, tags, thumbnail, thumbnailAlt, draft } = post.data;
 const authors = await getPostAuthors(post);
 const minutes = readingMinutes(post.body);
 const href = `/posts/${post.id}/`;
@@ -21,7 +22,11 @@ const Heading = headingLevel;
 
 <article class="post-item">
   <div class="post-item__body">
-    <TagList tags={tags} variant="inline" />
+    <div class="post-item__kicker">
+      <PostTypeLabel type={type} />
+      {tags.length > 0 && <span class="post-item__sep" aria-hidden="true">·</span>}
+      <TagList tags={tags} variant="inline" />
+    </div>
     <Heading class="post-item__title">
       <a href={href}>
         {draft && <span class="post-item__draft">초안</span>}
@@ -57,6 +62,17 @@ const Heading = headingLevel;
   .post-item__body {
     flex: 1;
     min-width: 0;
+  }
+  .post-item__kicker {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.45rem;
+    font-size: 0.8125rem;
+    color: var(--color-text-muted);
+  }
+  .post-item__sep {
+    color: var(--color-text-subtle);
   }
   .post-item__title {
     margin: 0.4rem 0 0;

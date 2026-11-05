@@ -19,6 +19,14 @@ const templatePath = path.join(root, 'templates/post.md');
 
 const SLUG_PATTERN = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 
+/** 글 종류 (src/site.config.ts의 POST_TYPES와 같게 유지) */
+const POST_TYPES = [
+  { key: 'tech', label: '기술', hint: '개념 정리, 튜토리얼, 트러블슈팅' },
+  { key: 'project', label: '프로젝트', hint: '만든 것 소개, 개발기, 케이스 스터디' },
+  { key: 'retro', label: '회고', hint: '회고, 에세이, 성장 이야기' },
+  { key: 'news', label: '소식', hint: '행사·세미나 후기, 동아리 공지' },
+];
+
 /** 영문·숫자만 남겨 slug 후보를 만듭니다. 한글 제목이면 빈 문자열이 될 수 있습니다. */
 function suggestSlug(title) {
   return title
@@ -129,6 +137,14 @@ async function main() {
   }
 
   const description = await ask('한 줄 설명 (목록과 검색 결과에 보여요)', `${title}에 대해 정리합니다.`);
+
+  console.log(POST_TYPES.map((t, i) => `  ${i + 1}. ${t.label} — ${t.hint}`).join('\n'));
+  let type;
+  while (!type) {
+    const answer = (await ask('글 종류 번호', '1')).toLowerCase();
+    type = POST_TYPES[Number(answer) - 1] ?? POST_TYPES.find((t) => t.key === answer || t.label === answer);
+    if (!type) console.log('  ⚠️  1~4 중에서 골라 주세요.');
+  }
   const tags = (await ask('태그 (쉼표로 구분, 예: React, 프론트엔드)'))
     .split(',')
     .map((tag) => tag.trim())
@@ -145,6 +161,7 @@ async function main() {
     .replace('{{description}}', yamlString(description))
     .replace('{{date}}', today())
     .replace('{{author}}', author)
+    .replace('{{type}}', type.key)
     .replace('{{tags}}', tags.length ? tags.map((tag) => `  - ${yamlString(tag)}`).join('\n') : '  - 기타');
 
   const dir = path.join(postsDir, slug);

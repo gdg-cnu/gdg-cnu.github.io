@@ -1,6 +1,6 @@
 import rss from '@astrojs/rss';
 import type { APIRoute } from 'astro';
-import { SITE } from '@/site.config';
+import { POST_TYPES, SITE } from '@/site.config';
 import { getPostAuthors, getPublishedPosts } from '@/utils/posts';
 
 const escapeXml = (value: string) =>
@@ -16,7 +16,7 @@ export const GET: APIRoute = async (context) => {
         description: post.data.description,
         pubDate: post.data.date,
         link: `/posts/${post.id}/`,
-        categories: post.data.tags,
+        categories: [POST_TYPES[post.data.type].label, ...post.data.tags],
         customData: authors
           .map((author) => `<dc:creator>${escapeXml(author.data.name)}</dc:creator>`)
           .join(''),
