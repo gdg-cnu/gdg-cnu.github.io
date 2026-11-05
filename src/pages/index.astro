@@ -4,6 +4,8 @@ import BaseLayout from '@/layouts/BaseLayout.astro';
 import PostList from '@/components/PostList.astro';
 import TagList from '@/components/TagList.astro';
 import SubscribeBox from '@/components/newsletter/SubscribeBox.astro';
+import Bracket from '@/components/brand/Bracket.astro';
+import Chevron from '@/components/brand/Chevron.astro';
 import { SITE } from '@/site.config';
 import { collectTags, getPublishedPosts } from '@/utils/posts';
 import { authorUrl, avatarUrl } from '@/utils/authors';
@@ -16,17 +18,39 @@ const authors = await getCollection('authors');
 
 <BaseLayout>
   <section class="hero container">
-    <h1>{SITE.heroTitle}</h1>
+    <div class="hero__mark">
+      <Bracket side="left" class="hero__bracket hero__bracket--left" />
+      <h1>{SITE.heroTitle}</h1>
+      <Bracket side="right" class="hero__bracket hero__bracket--right" />
+    </div>
+    {
+      /*
+        첫 진입 연출: 가운데 붙어 있던 < > 가 양옆으로 열리며 제목이 나타납니다.
+        그리기 전에 바로 실행되어 깜빡임이 없고, 자바스크립트가 꺼져 있거나
+        "동작 줄이기" 설정이면 처음부터 완성된 모습으로 보입니다.
+      */
+    }
+    <script is:inline>
+      (() => {
+        const hero = document.currentScript.parentElement;
+        if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+        const mark = hero.querySelector('.hero__mark');
+        const title = mark.querySelector('h1');
+        const gap = parseFloat(getComputedStyle(mark).columnGap) || 0;
+        hero.style.setProperty('--hero-shift', `${title.getBoundingClientRect().width / 2 + gap}px`);
+        hero.classList.add('is-closed');
+        requestAnimationFrame(() => requestAnimationFrame(() => hero.classList.remove('is-closed')));
+      })();
+    </script>
     <p class="hero__tagline">{SITE.heroTagline}</p>
     <p class="hero__topics">{SITE.topics.join(' · ')}</p>
-    <div class="brand-dash" aria-hidden="true"><span></span><span></span><span></span><span></span></div>
   </section>
 
   <div class="container container--narrow home">
     <section aria-labelledby="recent-heading">
       <div class="section-head">
         <h2 id="recent-heading">최근 글</h2>
-        <a href="/posts/">전체 보기 →</a>
+        <a href="/posts/">전체 보기 <Chevron side="right" /></a>
       </div>
       <PostList posts={recent} headingLevel="h3" />
     </section>
@@ -36,7 +60,7 @@ const authors = await getCollection('authors');
         <section aria-labelledby="tags-heading">
           <div class="section-head">
             <h2 id="tags-heading">태그</h2>
-            <a href="/tags/">모든 태그 →</a>
+            <a href="/tags/">모든 태그 <Chevron side="right" /></a>
           </div>
           <div class="home__tags">
             <TagList tags={tags.map((tag) => tag.name)} />
@@ -48,7 +72,7 @@ const authors = await getCollection('authors');
     <section aria-labelledby="members-heading">
       <div class="section-head">
         <h2 id="members-heading">글을 쓰는 사람들</h2>
-        <a href="/authors/">멤버 보기 →</a>
+        <a href="/authors/">멤버 보기 <Chevron side="right" /></a>
       </div>
       <ul class="home__members">
         {
@@ -76,22 +100,66 @@ const authors = await getCollection('authors');
     padding-bottom: 4.5rem;
     text-align: center;
   }
+  .hero__mark {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.32em;
+    font-size: clamp(1.5rem, 6.4vw, 3rem);
+  }
   .hero h1 {
     margin: 0;
-    font-size: clamp(2rem, 6vw, 3rem);
+    font-size: 1em;
     font-weight: 800;
     letter-spacing: -0.03em;
+    white-space: nowrap;
+    /* 꺾쇠와 같은 속도로 가운데부터 펼쳐져, 열린 만큼만 제목이 드러납니다. */
+    clip-path: inset(0 0 0 0);
+    transition: clip-path 0.9s cubic-bezier(0.65, 0, 0.25, 1) 0.15s;
+  }
+  .hero :global(.hero__bracket) {
+    flex-shrink: 0;
+    width: 0.78em;
+    height: auto;
+    transition: transform 0.9s cubic-bezier(0.65, 0, 0.25, 1) 0.15s;
   }
   .hero__tagline {
-    margin: 0.85rem 0 0;
+    margin: 1rem 0 0;
     font-size: 1.125rem;
     color: var(--color-text-muted);
+    transition: opacity 0.6s var(--ease) 0.75s;
   }
   .hero__topics {
-    margin: 1.25rem 0 1.75rem;
+    margin: 1.25rem 0 0;
     font-size: 0.75rem;
     letter-spacing: 0.18em;
     color: var(--color-text-subtle);
+    transition: opacity 0.6s var(--ease) 0.85s;
+  }
+
+  /* 열리기 전 상태 (스크립트가 잠깐 붙였다가 뗍니다) */
+  .hero.is-closed :global(.hero__bracket--left) {
+    transform: translateX(var(--hero-shift));
+    transition: none;
+  }
+  .hero.is-closed :global(.hero__bracket--right) {
+    transform: translateX(calc(-1 * var(--hero-shift)));
+    transition: none;
+  }
+  .hero.is-closed h1 {
+    clip-path: inset(0 50% 0 50%);
+    transition: none;
+  }
+  .hero.is-closed .hero__tagline,
+  .hero.is-closed .hero__topics {
+    opacity: 0;
+    transition: none;
+  }
+
+  @media (max-width: 360px) {
+    .hero__mark {
+      font-size: 1.3rem;
+    }
   }
 
   .home {

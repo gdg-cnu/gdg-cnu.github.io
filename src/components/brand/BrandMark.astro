@@ -1,0 +1,35 @@
+---
+/**
+ * GDG 로고 아이콘(< >)을 SVG로 그린 것
+ * 링크(a) 바로 안에 두면 마우스를 올렸을 때 두 꺾쇠가 살짝 벌어집니다. (global.css "모션")
+ */
+import { LEFT_PILLS, MARK_VIEWBOX, PILL, RIGHT_OFFSET, RIGHT_PILLS } from './pills';
+
+interface Props {
+  class?: string;
+  /** 표시 높이(px). 너비는 비율에 맞춰 정해집니다. */
+  height?: number;
+}
+
+const { class: className, height = 22 } = Astro.props;
+const [, , vbWidth, vbHeight] = MARK_VIEWBOX.split(' ').map(Number);
+const width = Math.round((height * vbWidth) / vbHeight);
+---
+
+<svg
+  class:list={['brand-mark', className]}
+  viewBox={MARK_VIEWBOX}
+  width={width}
+  height={height}
+  aria-hidden="true"
+  focusable="false"
+>
+  <g class="brand-mark__left">
+    {LEFT_PILLS.map((pill) => <rect class="bracket-pill" {...PILL} style={`fill:${pill.fill}`} transform={pill.transform} />)}
+  </g>
+  <g class="brand-mark__right">
+    <g transform={`translate(${RIGHT_OFFSET} 0)`}>
+      {RIGHT_PILLS.map((pill) => <rect class="bracket-pill" {...PILL} style={`fill:${pill.fill}`} transform={pill.transform} />)}
+    </g>
+  </g>
+</svg>

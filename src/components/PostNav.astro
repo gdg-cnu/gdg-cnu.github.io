@@ -1,5 +1,6 @@
 ---
 import type { Post } from '@/utils/posts';
+import Chevron from './brand/Chevron.astro';
 
 interface Props {
   /** 더 오래된 글 */
@@ -16,7 +17,7 @@ const { prev, next } = Astro.props;
     <nav class="post-nav" aria-label="이전 글, 다음 글">
       {prev ? (
         <a href={`/posts/${prev.id}/`} class="post-nav__item post-nav__item--prev">
-          <span class="post-nav__label">← 이전 글</span>
+          <span class="post-nav__label"><Chevron side="left" /> 이전 글</span>
           <span class="post-nav__title">{prev.data.title}</span>
         </a>
       ) : (
@@ -24,7 +25,7 @@ const { prev, next } = Astro.props;
       )}
       {next ? (
         <a href={`/posts/${next.id}/`} class="post-nav__item post-nav__item--next">
-          <span class="post-nav__label">다음 글 →</span>
+          <span class="post-nav__label">다음 글 <Chevron side="right" /></span>
           <span class="post-nav__title">{next.data.title}</span>
         </a>
       ) : (

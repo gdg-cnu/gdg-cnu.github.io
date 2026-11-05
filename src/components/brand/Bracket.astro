@@ -1,0 +1,38 @@
+---
+/**
+ * GDG 로고의 꺾쇠 하나 (< 또는 >)
+ *
+ * <Bracket side="right" class="chevron" />            작은 화살표로
+ * <Bracket side="left" drift />                       막대가 따로 떠다니는 404용
+ */
+import { BRACKET_VIEWBOX, LEFT_PILLS, PILL, RIGHT_PILLS } from './pills';
+
+interface Props {
+  side: 'left' | 'right';
+  class?: string;
+  /** 막대 두 개를 각각 <g class="bracket-piece">로 감싸 따로 움직일 수 있게 합니다. */
+  drift?: boolean;
+}
+
+const { side, class: className, drift = false } = Astro.props;
+const pills = side === 'left' ? LEFT_PILLS : RIGHT_PILLS;
+---
+
+<svg
+  class:list={['bracket', `bracket--${side}`, className]}
+  viewBox={BRACKET_VIEWBOX}
+  aria-hidden="true"
+  focusable="false"
+>
+  {
+    pills.map((pill, index) =>
+      drift ? (
+        <g class={`bracket-piece bracket-piece--${index + 1}`}>
+          <rect class="bracket-pill" {...PILL} style={`fill:${pill.fill}`} transform={pill.transform} />
+        </g>
+      ) : (
+        <rect class="bracket-pill" {...PILL} style={`fill:${pill.fill}`} transform={pill.transform} />
+      ),
+    )
+  }
+</svg>

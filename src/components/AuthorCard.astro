@@ -1,6 +1,7 @@
 ---
 import type { Author } from '@/utils/posts';
 import { authorUrl, avatarUrl } from '@/utils/authors';
+import Chevron from './brand/Chevron.astro';
 
 interface Props {
   author: Author;
@@ -36,7 +37,7 @@ const Heading = size === 'lg' ? 'h1' : 'p';
       {links?.website && <li><a href={links.website} target="_blank" rel="noopener noreferrer">Website ↗</a></li>}
       {links?.linkedin && <li><a href={links.linkedin} target="_blank" rel="noopener noreferrer">LinkedIn ↗</a></li>}
       {links?.email && <li><a href={`mailto:${links.email}`}>Email</a></li>}
-      {showPostsLink && size === 'md' && <li><a href={authorUrl(author)}>작성한 글 →</a></li>}
+      {showPostsLink && size === 'md' && <li><a href={authorUrl(author)}>작성한 글 <Chevron side="right" /></a></li>}
     </ul>
   </div>
 </section>

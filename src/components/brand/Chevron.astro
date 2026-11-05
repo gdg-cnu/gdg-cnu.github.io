@@ -1,0 +1,17 @@
+---
+/**
+ * 로고 꺾쇠 모양의 작은 화살표
+ * 링크나 버튼 안에 두면 마우스를 올렸을 때 화살표 방향으로 살짝 움직입니다. (global.css "모션")
+ *
+ * <a href="/posts/">전체 보기 <Chevron side="right" /></a>
+ */
+import Bracket from './Bracket.astro';
+
+interface Props {
+  side: 'left' | 'right';
+}
+
+const { side } = Astro.props;
+---
+
+<Bracket side={side} class={`chevron chevron--${side}`} />

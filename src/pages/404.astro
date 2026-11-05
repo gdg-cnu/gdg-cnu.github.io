@@ -1,11 +1,16 @@
 ---
 import BaseLayout from '@/layouts/BaseLayout.astro';
+import Bracket from '@/components/brand/Bracket.astro';
 ---
 
 <BaseLayout title="페이지를 찾을 수 없어요" noindex>
   <section class="not-found container container--narrow">
-    <p class="not-found__code">404</p>
-    <div class="brand-dash" aria-hidden="true"><span></span><span></span><span></span><span></span></div>
+    {/* 로고 꺾쇠가 흐트러진 채 떠다니는 연출. 마우스를 올리면 멈춥니다. */}
+    <div class="not-found__mark" aria-hidden="true">
+      <Bracket side="left" drift class="not-found__bracket" />
+      <span class="not-found__code">404</span>
+      <Bracket side="right" drift class="not-found__bracket" />
+    </div>
     <h1>페이지를 찾을 수 없어요</h1>
     <p>주소가 바뀌었거나 삭제된 글일 수 있어요.</p>
     <ul>
@@ -24,15 +29,55 @@ import BaseLayout from '@/layouts/BaseLayout.astro';
     padding-top: 6rem;
     text-align: center;
   }
+  .not-found__mark {
+    display: flex;
+    align-items: center;
+    gap: 1.25rem;
+  }
   .not-found__code {
-    margin: 0 0 1rem;
     font-size: 4rem;
     font-weight: 800;
     line-height: 1;
     letter-spacing: -0.04em;
   }
+  .not-found :global(.not-found__bracket) {
+    width: 3.25rem;
+    height: auto;
+  }
+
+  /* 막대마다 다른 방향·속도로 천천히 흔들려 '어긋난 태그'처럼 보이게 합니다. */
+  .not-found :global(.bracket-piece) {
+    transform-box: fill-box;
+    transform-origin: center;
+    animation: drift-a 3.4s ease-in-out infinite alternate;
+  }
+  .not-found :global(.bracket--left .bracket-piece--2),
+  .not-found :global(.bracket--right .bracket-piece--1) {
+    animation-name: drift-b;
+    animation-duration: 2.9s;
+  }
+  .not-found__mark:hover :global(.bracket-piece) {
+    animation-play-state: paused;
+  }
+  @keyframes drift-a {
+    from {
+      transform: translate(-22px, -26px) rotate(-10deg);
+    }
+    to {
+      transform: translate(12px, 8px) rotate(6deg);
+    }
+  }
+  @keyframes drift-b {
+    from {
+      transform: translate(20px, 24px) rotate(9deg);
+    }
+    to {
+      transform: translate(-12px, -8px) rotate(-6deg);
+    }
+  }
+
   .not-found h1 {
-    margin: 1.5rem 0 0.5rem;
+    margin: 2.25rem 0 0.5rem;
     font-size: 1.5rem;
   }
   .not-found p {
