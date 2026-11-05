@@ -1,9 +1,16 @@
 ---
+import { getCollection } from 'astro:content';
 import BaseLayout from '@/layouts/BaseLayout.astro';
+import PostList from '@/components/PostList.astro';
+import TagList from '@/components/TagList.astro';
 import { SITE } from '@/site.config';
-import { getPublishedPosts } from '@/utils/posts';
+import { collectTags, getPublishedPosts } from '@/utils/posts';
+import { authorUrl, avatarUrl } from '@/utils/authors';
 
 const posts = await getPublishedPosts();
+const recent = posts.slice(0, SITE.homePostCount);
+const tags = collectTags(posts).slice(0, 16);
+const authors = await getCollection('authors');
 ---
 
 <BaseLayout>
@@ -13,9 +20,48 @@ const posts = await getPublishedPosts();
     <p class="hero__topics">{SITE.topics.join(' · ')}</p>
     <div class="brand-dash" aria-hidden="true"><span></span><span></span><span></span><span></span></div>
   </section>
-  <section class="container container--narrow">
-    <ul>{posts.map((post) => <li><a href={`/posts/${post.id}/`}>{post.data.title}</a></li>)}</ul>
-  </section>
+
+  <div class="container container--narrow home">
+    <section aria-labelledby="recent-heading">
+      <div class="section-head">
+        <h2 id="recent-heading">최근 글</h2>
+        <a href="/posts/">전체 보기 →</a>
+      </div>
+      <PostList posts={recent} headingLevel="h3" />
+    </section>
+
+    {
+      tags.length > 0 && (
+        <section aria-labelledby="tags-heading">
+          <div class="section-head">
+            <h2 id="tags-heading">태그</h2>
+            <a href="/tags/">모든 태그 →</a>
+          </div>
+          <div class="home__tags">
+            <TagList tags={tags.map((tag) => tag.name)} />
+          </div>
+        </section>
+      )
+    }
+
+    <section aria-labelledby="members-heading">
+      <div class="section-head">
+        <h2 id="members-heading">글을 쓰는 사람들</h2>
+        <a href="/authors/">멤버 보기 →</a>
+      </div>
+      <ul class="home__members">
+        {
+          authors.map((author) => (
+            <li>
+              <a href={authorUrl(author)} title={author.data.name}>
+                <img src={avatarUrl(author, 96)} alt={author.data.name} width="44" height="44" loading="lazy" decoding="async" />
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </section>
+  </div>
 </BaseLayout>
 
 <style>
@@ -23,17 +69,18 @@ const posts = await getPublishedPosts();
     display: flex;
     flex-direction: column;
     align-items: center;
-    padding-top: 5rem;
-    padding-bottom: 4rem;
+    padding-top: 5.5rem;
+    padding-bottom: 4.5rem;
     text-align: center;
   }
   .hero h1 {
     margin: 0;
-    font-size: clamp(2rem, 5vw, 2.75rem);
+    font-size: clamp(2rem, 6vw, 3rem);
     font-weight: 800;
+    letter-spacing: -0.03em;
   }
   .hero__tagline {
-    margin: 0.75rem 0 0;
+    margin: 0.85rem 0 0;
     font-size: 1.125rem;
     color: var(--color-text-muted);
   }
@@ -42,5 +89,30 @@ const posts = await getPublishedPosts();
     font-size: 0.75rem;
     letter-spacing: 0.18em;
     color: var(--color-text-subtle);
+  }
+
+  .home {
+    display: flex;
+    flex-direction: column;
+    gap: 4.5rem;
+  }
+  .home__tags {
+    margin-top: 1rem;
+  }
+  .home__members {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.6rem;
+    margin: 1rem 0 0;
+    padding: 0;
+    list-style: none;
+  }
+  .home__members img {
+    border-radius: 50%;
+    background: var(--color-surface);
+    transition: transform 0.2s var(--ease);
+  }
+  .home__members a:hover img {
+    transform: translateY(-2px);
   }
 </style>

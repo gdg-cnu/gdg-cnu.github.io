@@ -1,0 +1,50 @@
+---
+import type { GetStaticPaths } from 'astro';
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import PageHeader from '@/components/PageHeader.astro';
+import PostList from '@/components/PostList.astro';
+import Pagination from '@/components/Pagination.astro';
+import { collectTags, getPublishedPosts, tagSlug, type Post } from '@/utils/posts';
+import { paginate, type PageInfo } from '@/utils/pagination';
+
+// /tags/astro/, /tags/astro/page/2/ ...
+export const getStaticPaths = (async () => {
+  const posts = await getPublishedPosts();
+  return collectTags(posts).flatMap((tag) => {
+    const tagged = posts.filter((post) => post.data.tags.some((t) => tagSlug(t) === tag.slug));
+    return paginate(tagged, `/tags/${tag.slug}/`).map(({ param, items, info }) => ({
+      params: { tag: tag.slug, page: param },
+      props: { tagName: tag.name, posts: items, info },
+    }));
+  });
+}) satisfies GetStaticPaths;
+
+interface Props {
+  tagName: string;
+  posts: Post[];
+  info: PageInfo;
+}
+
+const { tagName, posts, info } = Astro.props;
+---
+
+<BaseLayout title={`#${tagName}`} description={`'${tagName}' 태그가 붙은 글 ${info.total}개`}>
+  <div class="container container--narrow">
+    <PageHeader eyebrow="태그" title={`#${tagName}`} description={`${info.total}개의 글`}>
+      <a href="/tags/" class="all-tags">모든 태그 보기</a>
+    </PageHeader>
+    <PostList posts={posts} />
+    <Pagination info={info} />
+  </div>
+</BaseLayout>
+
+<style>
+  .all-tags {
+    margin-top: 0.75rem;
+    font-size: 0.875rem;
+    color: var(--color-text-subtle);
+  }
+  .all-tags:hover {
+    color: var(--color-text);
+  }
+</style>

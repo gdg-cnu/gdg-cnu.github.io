@@ -1,0 +1,89 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import PageHeader from '@/components/PageHeader.astro';
+import { getPublishedPosts } from '@/utils/posts';
+import { authorUrl, avatarUrl } from '@/utils/authors';
+
+const [authors, posts] = await Promise.all([getCollection('authors'), getPublishedPosts()]);
+const members = authors
+  .map((author) => ({
+    author,
+    count: posts.filter((post) => post.data.author.some((ref) => ref.id === author.id)).length,
+  }))
+  .sort((a, b) => b.count - a.count || a.author.data.name.localeCompare(b.author.data.name, 'ko'));
+---
+
+<BaseLayout title="멤버" description="GDG on Campus CNU 기술 블로그에 글을 쓰는 사람들">
+  <div class="container">
+    <PageHeader title="멤버" description="블로그에 글을 쓰는 사람들" />
+    <ul class="members">
+      {
+        members.map(({ author, count }) => (
+          <li>
+            <a href={authorUrl(author)} class="member">
+              <img src={avatarUrl(author, 128)} alt="" width="64" height="64" loading="lazy" decoding="async" />
+              <span class="member__name">{author.data.name}</span>
+              {author.data.role && <span class="member__role">{author.data.role}</span>}
+              {author.data.bio && <span class="member__bio">{author.data.bio}</span>}
+              <span class="member__count">글 {count}개</span>
+            </a>
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+</BaseLayout>
+
+<style>
+  .members {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 1rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .member {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    height: 100%;
+    padding: 1.75rem 1.25rem 1.5rem;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    text-align: center;
+    transition:
+      border-color 0.15s var(--ease),
+      background-color 0.15s var(--ease);
+  }
+  .member:hover {
+    border-color: var(--color-border-strong);
+    background: var(--color-surface);
+  }
+  .member img {
+    border-radius: 50%;
+    background: var(--color-surface);
+  }
+  .member__name {
+    margin-top: 0.9rem;
+    font-weight: 700;
+  }
+  .member__role {
+    margin-top: 0.15rem;
+    font-size: 0.8125rem;
+    color: var(--color-text-muted);
+  }
+  .member__bio {
+    margin-top: 0.6rem;
+    font-size: 0.875rem;
+    line-height: 1.55;
+    color: var(--color-text-muted);
+  }
+  .member__count {
+    margin-top: auto;
+    padding-top: 0.9rem;
+    font-size: 0.75rem;
+    color: var(--color-text-subtle);
+  }
+</style>

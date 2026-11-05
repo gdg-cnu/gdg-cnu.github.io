@@ -1,0 +1,24 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import PageHeader from '@/components/PageHeader.astro';
+import TagList from '@/components/TagList.astro';
+import { collectTags, getPublishedPosts } from '@/utils/posts';
+
+const tags = collectTags(await getPublishedPosts());
+const counts = Object.fromEntries(tags.map((tag) => [tag.name, tag.count]));
+---
+
+<BaseLayout title="태그" description="주제별로 글을 모아 봅니다.">
+  <div class="container container--narrow">
+    <PageHeader title="태그" description={`${tags.length}개의 태그`} />
+    <div class="tag-cloud">
+      <TagList tags={tags.map((tag) => tag.name)} counts={counts} />
+    </div>
+  </div>
+</BaseLayout>
+
+<style>
+  .tag-cloud :global(.tags) {
+    justify-content: center;
+  }
+</style>

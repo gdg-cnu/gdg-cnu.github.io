@@ -1,0 +1,34 @@
+---
+import type { GetStaticPaths } from 'astro';
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import PageHeader from '@/components/PageHeader.astro';
+import PostList from '@/components/PostList.astro';
+import Pagination from '@/components/Pagination.astro';
+import { getPublishedPosts, type Post } from '@/utils/posts';
+import { paginate, type PageInfo } from '@/utils/pagination';
+
+// /posts/, /posts/page/2/, /posts/page/3/ ...
+export const getStaticPaths = (async () => {
+  const posts = await getPublishedPosts();
+  return paginate(posts, '/posts/').map(({ param, items, info }) => ({
+    params: { page: param },
+    props: { posts: items, info },
+  }));
+}) satisfies GetStaticPaths;
+
+interface Props {
+  posts: Post[];
+  info: PageInfo;
+}
+
+const { posts, info } = Astro.props;
+const pageTitle = info.current > 1 ? `모든 글 (${info.current}페이지)` : '모든 글';
+---
+
+<BaseLayout title={pageTitle} description={`GDG on Campus CNU 기술 블로그의 글 ${info.total}개`}>
+  <div class="container container--narrow">
+    <PageHeader title="모든 글" description={`${info.total}개의 글`} />
+    <PostList posts={posts} />
+    <Pagination info={info} />
+  </div>
+</BaseLayout>

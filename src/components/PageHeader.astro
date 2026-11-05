@@ -1,0 +1,42 @@
+---
+interface Props {
+  title: string;
+  description?: string;
+  /** 제목 위 작은 라벨 (예: "태그") */
+  eyebrow?: string;
+}
+
+const { title, description, eyebrow } = Astro.props;
+---
+
+<header class="page-header">
+  {eyebrow && <p class="page-header__eyebrow">{eyebrow}</p>}
+  <h1>{title}</h1>
+  <div class="brand-dash" aria-hidden="true"><span></span><span></span><span></span><span></span></div>
+  {description && <p class="page-header__desc">{description}</p>}
+  <slot />
+</header>
+
+<style>
+  .page-header {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 4rem 0 2.5rem;
+    text-align: center;
+  }
+  .page-header__eyebrow {
+    margin: 0 0 0.5rem;
+    font-size: 0.8125rem;
+    color: var(--color-text-subtle);
+  }
+  .page-header h1 {
+    margin: 0 0 1rem;
+    font-size: clamp(1.75rem, 4vw, 2.25rem);
+    font-weight: 800;
+  }
+  .page-header__desc {
+    margin: 1rem 0 0;
+    color: var(--color-text-muted);
+  }
+</style>

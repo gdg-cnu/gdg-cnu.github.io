@@ -1,0 +1,59 @@
+---
+import type { GetStaticPaths } from 'astro';
+import { getCollection } from 'astro:content';
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import AuthorCard from '@/components/AuthorCard.astro';
+import PostList from '@/components/PostList.astro';
+import Pagination from '@/components/Pagination.astro';
+import { getPublishedPosts, type Author, type Post } from '@/utils/posts';
+import { paginate, type PageInfo } from '@/utils/pagination';
+
+// /authors/skrudwns/, /authors/skrudwns/page/2/ ...
+export const getStaticPaths = (async () => {
+  const [authors, posts] = await Promise.all([getCollection('authors'), getPublishedPosts()]);
+  return authors.flatMap((author) => {
+    const written = posts.filter((post) => post.data.author.some((ref) => ref.id === author.id));
+    return paginate(written, `/authors/${author.id}/`).map(({ param, items, info }) => ({
+      params: { id: author.id, page: param },
+      props: { author, posts: items, info },
+    }));
+  });
+}) satisfies GetStaticPaths;
+
+interface Props {
+  author: Author;
+  posts: Post[];
+  info: PageInfo;
+}
+
+const { author, posts, info } = Astro.props;
+const { name, bio } = author.data;
+---
+
+<BaseLayout title={`${name}의 글`} description={bio ?? `${name}님이 쓴 글 ${info.total}개`}>
+  <div class="container container--narrow">
+    <div class="author-hero">
+      <AuthorCard author={author} size="lg" />
+    </div>
+    <div class="section-head">
+      <h2>작성한 글 <span class="count">{info.total}</span></h2>
+    </div>
+    <PostList posts={posts} headingLevel="h3" emptyMessage="아직 작성한 글이 없어요." />
+    <Pagination info={info} />
+  </div>
+</BaseLayout>
+
+<style>
+  .author-hero {
+    padding: 4rem 0 3rem;
+  }
+  .count {
+    margin-left: 0.25rem;
+    color: var(--color-text-subtle);
+    font-weight: 500;
+  }
+  .section-head {
+    padding-bottom: 0.25rem;
+    border-bottom: 1px solid var(--color-border);
+  }
+</style>

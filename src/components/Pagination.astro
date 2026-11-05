@@ -1,0 +1,105 @@
+---
+import { pageUrl, type PageInfo } from '@/utils/pagination';
+
+interface Props {
+  info: PageInfo;
+}
+
+const { info } = Astro.props;
+const { current, last, base } = info;
+
+/** 1 … 4 5 [6] 7 8 … 12 형태의 페이지 번호 목록 */
+function pageNumbers(): (number | '…')[] {
+  const pages = new Set<number>([1, last, current - 1, current, current + 1]);
+  const sorted = [...pages].filter((n) => n >= 1 && n <= last).sort((a, b) => a - b);
+  const result: (number | '…')[] = [];
+  for (const [i, n] of sorted.entries()) {
+    const prev = sorted[i - 1];
+    if (prev !== undefined && n - prev > 1) result.push(n - prev === 2 ? n - 1 : '…');
+    result.push(n);
+  }
+  return result;
+}
+---
+
+{
+  last > 1 && (
+    <nav class="pagination" aria-label="페이지 이동">
+      {current > 1 ? (
+        <a href={pageUrl(base, current - 1)} class="pagination__step" rel="prev">
+          ← 이전
+        </a>
+      ) : (
+        <span class="pagination__step is-disabled">← 이전</span>
+      )}
+      <ol>
+        {pageNumbers().map((n) => (
+          <li>
+            {n === '…' ? (
+              <span class="pagination__ellipsis">…</span>
+            ) : (
+              <a href={pageUrl(base, n)} aria-current={n === current ? 'page' : undefined}>
+                {n}
+              </a>
+            )}
+          </li>
+        ))}
+      </ol>
+      {current < last ? (
+        <a href={pageUrl(base, current + 1)} class="pagination__step" rel="next">
+          다음 →
+        </a>
+      ) : (
+        <span class="pagination__step is-disabled">다음 →</span>
+      )}
+    </nav>
+  )
+}
+
+<style>
+  .pagination {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    margin-top: 3rem;
+    font-size: 0.875rem;
+  }
+  .pagination ol {
+    display: flex;
+    gap: 0.25rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .pagination ol a,
+  .pagination__ellipsis {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 2rem;
+    height: 2rem;
+    padding: 0 0.4rem;
+    border-radius: var(--radius-sm);
+    color: var(--color-text-muted);
+  }
+  .pagination ol a:hover {
+    background: var(--color-surface);
+    color: var(--color-text);
+  }
+  .pagination ol a[aria-current='page'] {
+    background: var(--color-text);
+    color: var(--color-bg);
+    font-weight: 600;
+  }
+  .pagination__step {
+    color: var(--color-text-muted);
+  }
+  a.pagination__step:hover {
+    color: var(--color-text);
+  }
+  .pagination__step.is-disabled {
+    color: var(--color-text-subtle);
+    opacity: 0.5;
+  }
+</style>

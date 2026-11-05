@@ -1,0 +1,35 @@
+---
+import PostItem from './PostItem.astro';
+import type { Post } from '@/utils/posts';
+
+interface Props {
+  posts: Post[];
+  headingLevel?: 'h2' | 'h3';
+  emptyMessage?: string;
+}
+
+const { posts, headingLevel, emptyMessage = '아직 글이 없어요. 첫 글의 주인공이 되어 주세요!' } = Astro.props;
+---
+
+{
+  posts.length > 0 ? (
+    <div class="post-list">
+      {posts.map((post) => (
+        <PostItem post={post} headingLevel={headingLevel} />
+      ))}
+    </div>
+  ) : (
+    <p class="post-list__empty">{emptyMessage}</p>
+  )
+}
+
+<style>
+  .post-list > :global(:last-child) {
+    border-bottom: 0;
+  }
+  .post-list__empty {
+    padding: 3rem 0;
+    text-align: center;
+    color: var(--color-text-muted);
+  }
+</style>
