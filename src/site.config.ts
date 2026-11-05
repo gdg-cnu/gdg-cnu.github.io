@@ -19,7 +19,7 @@ export const SITE = {
   /** 홈 히어로 */
   heroTitle: 'GDG on Campus CNU',
   heroTagline: '함께 배우고, 만든 것을 나눕니다.',
-  topics: ['WEB', 'MOBILE', 'AI', 'CLOUD'],
+  topics: ['DEV', 'AI', 'DATA', 'GAME', 'DESIGN'],
   /** 배포 주소 (astro.config.mjs의 site와 같아야 합니다) */
   url: 'https://gdg-cnu.github.io',
   lang: 'ko',
