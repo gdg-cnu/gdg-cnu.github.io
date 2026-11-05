@@ -1,5 +1,16 @@
 ---
 import { SITE } from '@/site.config';
+import { getPublishedPosts, getPostAuthors, readingMinutes } from '@/utils/posts';
+import { formatDate } from '@/utils/date';
+
+const posts = await getPublishedPosts();
+const rows = await Promise.all(
+  posts.map(async (post) => ({
+    post,
+    authors: await getPostAuthors(post),
+    minutes: readingMinutes(post.body),
+  })),
+);
 ---
 
 <html lang={SITE.lang}>
@@ -10,5 +21,15 @@ import { SITE } from '@/site.config';
   </head>
   <body>
     <h1>{SITE.title}</h1>
+    <ul>
+      {
+        rows.map(({ post, authors, minutes }) => (
+          <li>
+            {post.id} · {post.data.title} · {formatDate(post.data.date)} ·{' '}
+            {authors.map((a) => a.data.name).join(', ')} · {minutes}분 · {post.data.tags.join(', ')}
+          </li>
+        ))
+      }
+    </ul>
   </body>
 </html>

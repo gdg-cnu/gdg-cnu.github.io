@@ -1,0 +1,61 @@
+---
+/**
+ * MDX 글에서 import 없이 바로 쓸 수 있는 안내 박스
+ *
+ * <Callout type="tip" title="알아두면 좋아요">
+ *   내용
+ * </Callout>
+ */
+interface Props {
+  type?: 'note' | 'tip' | 'warning' | 'danger';
+  title?: string;
+}
+
+const DEFAULT_TITLES = {
+  note: '참고',
+  tip: '팁',
+  warning: '주의',
+  danger: '위험',
+} as const;
+
+const { type = 'note', title } = Astro.props;
+---
+
+<aside class:list={['callout', `callout--${type}`]}>
+  <p class="callout__title">{title ?? DEFAULT_TITLES[type]}</p>
+  <div class="callout__body">
+    <slot />
+  </div>
+</aside>
+
+<style>
+  .callout {
+    --callout-accent: var(--gdg-blue);
+    margin: 1.75rem 0;
+    padding: 1rem 1.25rem;
+    border-left: 3px solid var(--callout-accent);
+    border-radius: 0 0.5rem 0.5rem 0;
+    background: var(--color-surface);
+  }
+  .callout--tip {
+    --callout-accent: var(--gdg-green);
+  }
+  .callout--warning {
+    --callout-accent: var(--gdg-yellow);
+  }
+  .callout--danger {
+    --callout-accent: var(--gdg-red);
+  }
+  .callout__title {
+    margin: 0 0 0.25rem;
+    font-size: 0.875rem;
+    font-weight: 700;
+    color: var(--callout-accent);
+  }
+  .callout__body :global(> :first-child) {
+    margin-top: 0;
+  }
+  .callout__body :global(> :last-child) {
+    margin-bottom: 0;
+  }
+</style>

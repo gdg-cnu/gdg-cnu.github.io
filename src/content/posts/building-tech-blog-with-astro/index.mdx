@@ -1,0 +1,109 @@
+---
+title: Astro로 기술 블로그 만들기
+description: 마크다운 파일 하나가 검증되고, 페이지가 되고, 배포되기까지. 이 블로그가 동작하는 방식을 따라가 봅니다.
+date: 2026-11-05
+author: skrudwns
+tags:
+  - Astro
+  - 웹
+  - GitHub Actions
+thumbnail: ./cover.png
+thumbnailAlt: 꺾쇠 모양의 GDG 컬러 도형과 코드 줄을 표현한 일러스트
+draft: false
+---
+
+이 블로그는 [Astro](https://astro.build)로 만든 정적 사이트입니다. 서버도 데이터베이스도 없이, 마크다운 파일만으로 글 목록과 태그, 작성자 페이지, RSS, 검색까지 만들어집니다. 이번 글에서는 마크다운 파일 하나가 웹 페이지가 되기까지의 과정을 따라가 보겠습니다.
+
+## 왜 Astro인가
+
+정적 사이트 생성기는 Hugo, Jekyll, Next.js 등 선택지가 많습니다. 그중 Astro를 고른 이유는 세 가지입니다.
+
+| 기준 | Astro를 고른 이유 |
+| --- | --- |
+| 기여 방식 | 여러 부원이 PR로 글을 올리므로, 잘못된 글을 **빌드 단계에서 걸러낼 수 있어야** 했습니다. |
+| 학습 비용 | `.astro` 파일은 HTML에 가까워서 프런트엔드 경험이 많지 않아도 금방 읽을 수 있습니다. |
+| 결과물 | 기본적으로 자바스크립트를 내보내지 않아 페이지가 가볍고 빠릅니다. |
+
+## 콘텐츠 컬렉션으로 글 검증하기
+
+Astro의 **콘텐츠 컬렉션**은 마크다운 frontmatter에 스키마를 붙이는 기능입니다. 이 블로그의 글 스키마는 대략 다음과 같습니다.
+
+```ts title="src/content.config.ts" {9-11}
+const posts = defineCollection({
+  loader: glob({ pattern: '**/*.{md,mdx}', base: './src/content/posts' }),
+  schema: ({ image }) =>
+    z.object({
+      title: z.string().min(1),
+      description: z.string().min(1),
+      date: z.coerce.date(),
+      tags: z.array(z.string()).default([]),
+      author: z
+        .union([reference('authors'), z.array(reference('authors')).min(1)])
+        .transform((value) => (Array.isArray(value) ? value : [value])),
+      thumbnail: image().optional(),
+      draft: z.boolean().default(false),
+    }),
+});
+```
+
+강조한 `author` 필드는 `reference('authors')`로 작성자 컬렉션을 가리킵니다. 그래서 등록되지 않은 작성자 ID를 적으면 빌드가 실패합니다.
+
+<Callout type="tip" title="PR 체크에서 바로 확인할 수 있어요">
+  Pull Request를 올리면 GitHub Actions가 빌드를 돌립니다. 작성자 ID 오타나 날짜 형식 오류가 있으면 리뷰어가 보기 전에 체크가 실패해서 바로 알 수 있습니다.
+</Callout>
+
+## 글 목록과 페이지네이션
+
+글 목록은 `getCollection()`으로 가져온 뒤 날짜순으로 정렬합니다. 초안(`draft: true`)은 개발 서버에서만 보이도록 걸러냅니다.
+
+```ts title="src/utils/posts.ts"
+export async function getPublishedPosts() {
+  const posts = await getCollection(
+    'posts',
+    ({ data }) => import.meta.env.DEV || !data.draft,
+  );
+  return posts.sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
+}
+```
+
+### 태그 페이지
+
+태그는 `React`와 `react`가 다른 태그로 갈라지지 않도록 소문자로 바꾼 값을 URL로 씁니다. 화면에는 처음 쓰인 표기를 그대로 보여줍니다.
+
+```ts
+tagSlug('GitHub Actions'); // → 'github-actions'
+tagSlug('웹'); // → '웹'
+```
+
+## 예상 읽기 시간
+
+영어권 도구는 대부분 단어 수로 읽기 시간을 계산합니다. 한국어는 띄어쓰기 단위가 영어 단어보다 길어서, 이 블로그에서는 **한글은 글자 수**, 영문은 단어 수로 따로 셉니다.
+
+```ts {2-3}
+const minutes =
+  hangulCount / 500 + // 한글: 분당 약 500자
+  wordCount / 200; // 영문: 분당 약 200단어
+```
+
+## GitHub Pages로 배포하기
+
+`main` 브랜치에 커밋이 들어오면 워크플로가 사이트를 빌드하고 GitHub Pages에 올립니다.
+
+```yaml title=".github/workflows/deploy.yml" del={1} ins={2}
+# 수동으로 dist 폴더를 올리던 방식은 그만!
+on:
+  push:
+    branches: [main]
+```
+
+빌드가 끝나면 [Pagefind](https://pagefind.app)가 만들어진 HTML을 읽어 검색 인덱스를 생성합니다. 덕분에 서버 없이도 글 검색이 동작합니다.
+
+## 마치며
+
+정리하면 이 블로그의 흐름은 다음과 같습니다.
+
+1. 마크다운으로 글을 쓰고 PR을 올린다.
+2. 스키마가 frontmatter를 검사한다.
+3. 리뷰 후 머지하면 Actions가 빌드하고 배포한다.
+
+글을 쓰는 사람은 마크다운에만 집중하면 됩니다. 나머지는 도구가 알아서 해 주니까요.
