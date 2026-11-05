@@ -3,6 +3,11 @@ import { NAV, SITE, SOCIAL } from '@/site.config';
 import BrandMark from './brand/BrandMark.astro';
 
 const year = new Date().getFullYear();
+const links = [
+  ...NAV,
+  { label: '검색', href: '/search/' },
+  { label: 'RSS', href: '/rss.xml' },
+];
 const externalLinks = [
   { label: 'GitHub', href: SOCIAL.github },
   { label: 'GDG 커뮤니티', href: SOCIAL.community },
@@ -12,54 +17,47 @@ const externalLinks = [
 
 <footer class="site-footer">
   <div class="container site-footer__inner">
-    <div class="site-footer__brand">
+    <div class="site-footer__top">
       <a href="/" class="site-footer__logo">
         <BrandMark height={16} />
         <span>{SITE.brand}</span>
       </a>
-      <p>{SITE.description}</p>
+      <nav aria-label="바닥글 메뉴">
+        <ul class="site-footer__links">
+          {links.map((item) => <li><a href={item.href}>{item.label}</a></li>)}
+          {
+            externalLinks.map((link) => (
+              <li>
+                <a href={link.href} target="_blank" rel="noopener noreferrer">
+                  {link.label} ↗
+                </a>
+              </li>
+            ))
+          }
+        </ul>
+      </nav>
     </div>
-
-    <nav class="site-footer__links" aria-label="바닥글 메뉴">
-      <ul>
-        {NAV.map((item) => <li><a href={item.href}>{item.label}</a></li>)}
-        <li><a href="/search/">검색</a></li>
-        <li><a href="/rss.xml">RSS</a></li>
-      </ul>
-      <ul>
-        {
-          externalLinks.map((link) => (
-            <li>
-              <a href={link.href} target="_blank" rel="noopener noreferrer">
-                {link.label} ↗
-              </a>
-            </li>
-          ))
-        }
-      </ul>
-    </nav>
-  </div>
-  <div class="container site-footer__bottom">
-    <p>© {year} {SITE.brand}. 글의 저작권은 각 작성자에게 있습니다.</p>
+    <p class="site-footer__copy">© {year} {SITE.brand} · 글의 저작권은 각 작성자에게 있습니다.</p>
   </div>
 </footer>
 
 <style>
   .site-footer {
-    margin-top: 6rem;
+    margin-top: 4.5rem;
     border-top: 1px solid var(--color-border);
     font-size: 0.875rem;
     color: var(--color-text-muted);
   }
   .site-footer__inner {
-    display: flex;
-    justify-content: space-between;
-    gap: 2rem;
-    padding-top: 2.5rem;
-    padding-bottom: 1.5rem;
+    padding-top: 1.75rem;
+    padding-bottom: 2rem;
   }
-  .site-footer__brand {
-    max-width: 26rem;
+  .site-footer__top {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem 2rem;
   }
   .site-footer__logo {
     display: inline-flex;
@@ -68,38 +66,20 @@ const externalLinks = [
     font-weight: 700;
     color: var(--color-text);
   }
-  .site-footer__brand p {
-    margin: 0.75rem 0 0;
-    line-height: 1.6;
-  }
   .site-footer__links {
     display: flex;
-    gap: 3rem;
-  }
-  .site-footer__links ul {
+    flex-wrap: wrap;
+    gap: 0.25rem 1.25rem;
     margin: 0;
     padding: 0;
     list-style: none;
-    display: grid;
-    gap: 0.4rem;
-    align-content: start;
   }
   .site-footer__links a:hover {
     color: var(--color-text);
   }
-  .site-footer__bottom {
-    padding-top: 1rem;
-    padding-bottom: 2.5rem;
+  .site-footer__copy {
+    margin: 1rem 0 0;
     color: var(--color-text-subtle);
     font-size: 0.8125rem;
-  }
-  .site-footer__bottom p {
-    margin: 0;
-  }
-
-  @media (max-width: 640px) {
-    .site-footer__inner {
-      flex-direction: column;
-    }
   }
 </style>
