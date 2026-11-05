@@ -53,7 +53,7 @@ export interface OgOptions {
   meta?: string;
 }
 
-export async function renderOgImage({ title, subtitle, meta }: OgOptions): Promise<Uint8Array> {
+export async function renderOgImage({ title, subtitle, meta }: OgOptions): Promise<Uint8Array<ArrayBuffer>> {
   const { fonts, logo } = await loadAssets();
   const titleSize = title.length > 40 ? 54 : 64;
 
@@ -115,5 +115,6 @@ export async function renderOgImage({ title, subtitle, meta }: OgOptions): Promi
   );
 
   const svg = await satori(tree as Parameters<typeof satori>[0], { width: WIDTH, height: HEIGHT, fonts });
-  return new Resvg(svg, { fitTo: { mode: 'width', value: WIDTH } }).render().asPng();
+  // Response 본문으로 바로 쓸 수 있도록 ArrayBuffer 기반 Uint8Array로 복사합니다.
+  return new Uint8Array(new Resvg(svg, { fitTo: { mode: 'width', value: WIDTH } }).render().asPng());
 }

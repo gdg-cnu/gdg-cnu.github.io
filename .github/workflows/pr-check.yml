@@ -1,0 +1,49 @@
+# PR마다 타입·콘텐츠 스키마 검사와 빌드를 돌립니다.
+# frontmatter 누락, 등록되지 않은 작성자 ID, 깨진 이미지 경로 등이 있으면 여기서 실패합니다.
+# 브랜치 보호 규칙에서 "PR Check" 를 필수 상태 체크로 지정하세요.
+name: PR Check
+
+on:
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: pr-check-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  check:
+    name: PR Check
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Setup Node
+        uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Type & content check
+        run: npm run check
+
+      - name: Build
+        run: npm run build
+
+      - name: Summary
+        run: |
+          {
+            echo "### ✅ 빌드 성공"
+            echo ""
+            echo "| 항목 | 개수 |"
+            echo "| --- | --- |"
+            echo "| 글 페이지 | $(find dist/posts -mindepth 2 -name index.html -not -path '*/page/*' | wc -l | tr -d ' ') |"
+            echo "| 전체 HTML | $(find dist -name '*.html' | wc -l | tr -d ' ') |"
+          } >> "$GITHUB_STEP_SUMMARY"
