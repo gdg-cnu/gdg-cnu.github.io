@@ -3,6 +3,33 @@ import { defineConfig } from 'astro/config';
 import mdx from '@astrojs/mdx';
 import sitemap from '@astrojs/sitemap';
 import expressiveCode from 'astro-expressive-code';
+import fs from 'node:fs';
+import path from 'node:path';
+
+/**
+ * 개발 서버에서도 검색을 쓸 수 있게 해 주는 플러그인
+ * 검색 인덱스(dist/pagefind)는 `npm run build` 때만 만들어지므로,
+ * 개발 서버(`npm run dev`)는 마지막으로 빌드한 인덱스를 /pagefind/ 주소로 그대로 내려줍니다.
+ * 배포 빌드에는 영향이 없습니다.
+ * @returns {import('vite').Plugin}
+ */
+function pagefindInDev() {
+  const root = path.resolve('dist/pagefind');
+  /** @type {Record<string, string>} */
+  const types = { '.js': 'text/javascript', '.css': 'text/css', '.json': 'application/json', '.wasm': 'application/wasm' };
+  return {
+    name: 'pagefind-in-dev',
+    apply: 'serve',
+    configureServer(server) {
+      server.middlewares.use('/pagefind', (req, res, next) => {
+        const file = path.join(root, decodeURIComponent((req.url ?? '/').split('?')[0]));
+        if (!file.startsWith(root + path.sep) || !fs.existsSync(file) || fs.statSync(file).isDirectory()) return next();
+        res.setHeader('Content-Type', types[path.extname(file)] ?? 'application/octet-stream');
+        fs.createReadStream(file).pipe(res);
+      });
+    },
+  };
+}
 
 // https://docs.astro.build/en/reference/configuration-reference/
 export default defineConfig({
@@ -31,4 +58,7 @@ export default defineConfig({
       filter: (page) => !page.includes('/search/'),
     }),
   ],
+  vite: {
+    plugins: [pagefindInDev()],
+  },
 });
