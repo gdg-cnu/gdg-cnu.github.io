@@ -85,15 +85,12 @@ const article = {
 
     <div class="post-body">
       <div class="post-body__main">
-        <div data-pagefind-ignore>
-          <Toc headings={headings} variant="inline" />
-        </div>
         <div class="prose">
           <slot />
         </div>
       </div>
       <aside class="post-body__aside" data-pagefind-ignore>
-        <Toc headings={headings} variant="sidebar" />
+        <Toc headings={headings} />
       </aside>
     </div>
 
@@ -178,7 +175,7 @@ const article = {
     display: none;
   }
 
-  /* 오른쪽 여백이 목차를 담을 만큼 넓을 때만 보여 줍니다.
+  /* 오른쪽 여백이 목차를 담을 만큼 넓을 때만 보여 줍니다. (좁은 화면에서는 목차를 두지 않음)
      폭을 고정하지 않고 남은 여백에 맞춰 줄어들게 해서, 스크롤바가 있는 환경에서도 화면 밖으로 밀려나지 않습니다. */
   @media (min-width: 1240px) {
     .post-body__aside {
@@ -188,9 +185,6 @@ const article = {
       max-width: calc(240px + 3.5rem + 1.25rem);
       padding-left: clamp(1.5rem, 4vw - 1.5rem, 3.5rem);
       padding-right: 1.25rem;
-    }
-    .post-body__main :global(.toc--inline) {
-      display: none;
     }
   }
 

@@ -1,43 +1,30 @@
 ---
 import type { MarkdownHeading } from 'astro';
 
+/** 넓은 화면에서 본문 오른쪽에 따라다니는 목차 (좁은 화면에서는 PostLayout이 숨깁니다) */
 interface Props {
   headings: MarkdownHeading[];
-  /** sidebar: 넓은 화면 오른쪽 고정 / inline: 본문 위 접이식 */
-  variant: 'sidebar' | 'inline';
 }
 
-const { headings, variant } = Astro.props;
+const { headings } = Astro.props;
 const items = headings.filter((heading) => heading.depth === 2 || heading.depth === 3);
 ---
 
 {
-  items.length >= 2 &&
-    (variant === 'sidebar' ? (
-      <nav class="toc toc--sidebar" aria-label="목차">
-        <p class="toc__title">목차</p>
-        <ol>
-          {items.map((heading) => (
-            <li class={`depth-${heading.depth}`}>
-              <a href={`#${heading.slug}`} data-toc-link={heading.slug}>
-                {heading.text}
-              </a>
-            </li>
-          ))}
-        </ol>
-      </nav>
-    ) : (
-      <details class="toc toc--inline">
-        <summary>목차</summary>
-        <ol>
-          {items.map((heading) => (
-            <li class={`depth-${heading.depth}`}>
-              <a href={`#${heading.slug}`}>{heading.text}</a>
-            </li>
-          ))}
-        </ol>
-      </details>
-    ))
+  items.length >= 2 && (
+    <nav class="toc toc--sidebar" aria-label="목차">
+      <p class="toc__title">목차</p>
+      <ol>
+        {items.map((heading) => (
+          <li class={`depth-${heading.depth}`}>
+            <a href={`#${heading.slug}`} data-toc-link={heading.slug}>
+              {heading.text}
+            </a>
+          </li>
+        ))}
+      </ol>
+    </nav>
+  )
 }
 
 <style>
@@ -81,24 +68,6 @@ const items = headings.filter((heading) => heading.depth === 2 || heading.depth 
     font-weight: 600;
   }
 
-  .toc--inline {
-    margin-bottom: 2.5rem;
-    padding: 0.85rem 1.1rem;
-    border-radius: var(--radius-sm);
-    background: var(--color-surface);
-  }
-  .toc--inline summary {
-    cursor: pointer;
-    font-size: 0.875rem;
-    font-weight: 600;
-    color: var(--color-text-muted);
-  }
-  .toc--inline ol {
-    margin-top: 0.6rem;
-  }
-  .toc--inline a {
-    font-size: 0.875rem;
-  }
 </style>
 
 <script>
