@@ -2,7 +2,7 @@
 title: "인지 부채: 속도가 이해를 앞지를 때"
 description: AI가 만드는 속도를 이해가 따라가지 못하면 생기는 빚, 인지 부채. 바이브 코딩으로 굴리기 시작한 빚이 레거시가 되기까지를 따라가 봅니다.
 date: 2026-11-24
-author: skrudwns
+author: onee-only
 type: retro
 tags:
   - AI
