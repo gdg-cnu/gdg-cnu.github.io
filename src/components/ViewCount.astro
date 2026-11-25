@@ -34,7 +34,10 @@ const code = ANALYTICS.goatcounterCode;
   const code = el?.dataset.goatcounterCode;
   if (el && code) {
     const path = window.location.pathname;
-    fetch(`https://${code}.goatcounter.com/counter/${encodeURIComponent(path)}.json`)
+    // start 없이 요청하면 최근 방문이 빠진 숫자가 오래 캐시되는 경우가 있어,
+    // 블로그를 연 무렵부터의 전체 조회수를 명시적으로 요청합니다.
+    const start = '2026-11-01';
+    fetch(`https://${code}.goatcounter.com/counter/${encodeURIComponent(path)}.json?start=${start}`)
       .then((response) => (response.ok ? response.json() : null))
       .then((data: { count?: string } | null) => {
         // count는 "1,234" 같은 문자열로 옵니다.

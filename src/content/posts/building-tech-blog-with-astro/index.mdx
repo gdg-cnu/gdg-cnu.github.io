@@ -103,7 +103,7 @@ const goatcounter = import.meta.env.PROD && ANALYTICS.goatcounterCode;
 
 ```ts title="src/components/ViewCount.astro (요약)"
 const path = window.location.pathname;
-fetch(`https://${code}.goatcounter.com/counter/${encodeURIComponent(path)}.json`)
+fetch(`https://${code}.goatcounter.com/counter/${encodeURIComponent(path)}.json?start=2026-11-01`)
   .then((response) => (response.ok ? response.json() : null))
   .then((data) => {
     const count = Number(String(data?.count ?? '').replace(/\D/g, ''));
@@ -111,6 +111,8 @@ fetch(`https://${code}.goatcounter.com/counter/${encodeURIComponent(path)}.json`
   })
   .catch(() => {}); // 조회수는 부가 정보라 실패해도 조용히 넘어감
 ```
+
+주소 끝의 `start`는 블로그를 연 무렵의 날짜입니다. 이 값 없이 요청하면 최근 방문이 빠진 숫자가 몇 시간씩 그대로 남아 있는 경우가 있어, 집계 시작 날짜를 직접 정해 줍니다.
 
 아직 아무도 읽지 않은 글은 404가 돌아오는데, 이때는 "조회 0"을 띄우기보다 조회수 자리를 아예 숨기도록 했습니다.
 
